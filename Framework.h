@@ -23,5 +23,13 @@
 
 #include <memory>
 #include <iostream>
+#include <sstream>
+#include <string>
+
+#include <Windows.h>
+
+#include "Define.h"
+
+using namespace std;
 
 #endif

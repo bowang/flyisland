@@ -1,0 +1,389 @@
+#include "RenderManager.h"
+#include "Root.h"
+
+extern sf::RenderWindow window;
+
+RenderManager::RenderManager(Root* root)
+{
+    this->root = root;
+    depthBuffer = new DepthRenderTarget(window.GetWidth(), window.GetHeight());
+}
+
+void RenderManager::initOpenGL() 
+{
+    // Initialize GLEW on Windows, to make sure that OpenGL 2.0 is loaded
+#ifdef FRAMEWORK_USE_GLEW
+    GLint error = glewInit();
+    if (GLEW_OK != error) {
+        std::cerr << glewGetErrorString(error) << std::endl;
+        exit(-1);
+    }
+    if (!GLEW_VERSION_2_0 || !GL_EXT_framebuffer_object) {
+        std::cerr << "This program requires OpenGL 2.0 and FBOs" << std::endl;
+        exit(-1);
+    }
+#endif
+
+    glClearDepth(1.0f);
+    glClearColor(0.655f, 0.855f, 0.973f, 1.0f);
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_TRUE);
+    glViewport(0, 0, window.GetWidth(), window.GetHeight());
+
+    glHint(GL_GENERATE_MIPMAP_HINT, GL_NICEST);
+    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+    glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
+    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+    glHint(GL_TEXTURE_COMPRESSION_HINT, GL_NICEST);
+
+    shaders.resize(root->mNumOfShaders);
+    loadShaders();
+
+}
+
+void RenderManager::preprocess()
+{
+    renderCubeFaces(root->mSceneManager->mSceneNodes[0]);
+}
+
+void RenderManager::renderFrame() 
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    for(int shaderIdx = 0; shaderIdx < root->mNumOfShaders; shaderIdx++){
+        switch(shaderIdx){
+        // Perform OpenGL initialization for the particular shader
+
+        case 2:
+            GL_CHECK(glUseProgram(shaders[shaderIdx]->programID()))
+            GL_CHECK(glViewport(0, 0, window.GetWidth(), window.GetHeight()))
+            GL_CHECK(setCamera())
+            for(int i = 0; i < root->mSceneManager->mSceneNodes.size(); i++){
+                renderScene(root->mSceneManager->mSceneNodes[i], shaderIdx);
+            }
+            break;
+
+        default:  // Phong shader is set as the default shader
+            GL_CHECK(glUseProgram(shaders[shaderIdx]->programID()))
+            GL_CHECK(glViewport(0, 0, window.GetWidth(), window.GetHeight()))
+            GL_CHECK(setCamera())
+            GL_CHECK(setLight())
+            GL_CHECK(glCullFace(GL_BACK))
+            for(int i = 0; i < root->mSceneManager->mSceneNodes.size(); i++){
+                renderScene(root->mSceneManager->mSceneNodes[i], shaderIdx);
+            }
+            break;
+        }
+    }
+}
+
+void RenderManager::renderScene(SceneNode& scene, int shaderIdx)
+{
+    GL_CHECK(glPushMatrix())
+
+    GL_CHECK(glTranslatef(scene.mPosition.x, scene.mPosition.y, scene.mPosition.z))
+    GL_CHECK(glRotatef(scene.mRotateAngle, scene.mRotate.x, scene.mRotate.y, scene.mRotate.z))
+    GL_CHECK(glScalef(scene.mScale.x, scene.mScale.y, scene.mScale.z))
+    if(scene.useShader(shaderIdx))
+        renderNode(scene.mScene->mRootNode, scene, shaders[shaderIdx]);
+    GL_CHECK(glPopMatrix())
+}
+
+void RenderManager::renderNode(aiNode* node, SceneNode& scene, Shader* shader)
+{
+    GL_CHECK(glPushMatrix())
+    aiMatrix4x4 &m = node->mTransformation;
+    GLfloat modelMatrix [] = {m.a1, m.b1, m.c1, m.d1,
+                              m.a2, m.b2, m.c2, m.d2,
+                              m.a3, m.b3, m.c3, m.d3,
+                              m.a4, m.b4, m.c4, m.d4};
+    GL_CHECK(glMatrixMode(GL_MODELVIEW))
+    GL_CHECK(glMultMatrixf(modelMatrix))
+
+    for(unsigned i = 0; i < node->mNumMeshes; i++){
+        aiMesh* mesh = scene.mScene->mMeshes[node->mMeshes[i]];
+        // TODO: Use Octree to cull meshes here
+        GL_CHECK(setMaterial(scene.mScene, mesh, shader))
+        GL_CHECK(setTextures(scene.mTexture, mesh, shader))
+        GL_CHECK(setMeshData(mesh, shader))
+        GL_CHECK(glDrawElements(GL_TRIANGLES, 3*mesh->mNumFaces, GL_UNSIGNED_INT, &(scene.mIndexBuffer[node->mMeshes[i]][0])))
+    }
+
+    for(unsigned i = 0; i < node->mNumChildren; i++){
+        renderNode(node->mChildren[i], scene, shader);
+    }
+
+    GL_CHECK(glPopMatrix())
+}
+
+void RenderManager::setMaterial(const aiScene* scene, aiMesh* mesh, Shader* shader)
+{
+    aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+    aiColor3D color;
+    GLint ambient, diffuse, specular, shininess;
+
+    if(shader->useAmbient){
+        GL_CHECK(ambient = glGetUniformLocation(shader->programID(), "Ka"))
+        material->Get(AI_MATKEY_COLOR_AMBIENT, color);
+        GL_CHECK(glUniform3f(ambient, color.r, color.g, color.b))
+    }
+
+    if(shader->useDiffuse){
+        GL_CHECK(diffuse = glGetUniformLocation(shader->programID(), "Kd"))
+        material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+        GL_CHECK(glUniform3f(diffuse, color.r, color.g, color.b))
+    }
+
+    if(shader->useSpecular){
+        // set Ks
+        GL_CHECK(specular = glGetUniformLocation(shader->programID(), "Ks"))
+        material->Get(AI_MATKEY_COLOR_SPECULAR, color);
+        GL_CHECK(glUniform3f(specular, color.r, color.g, color.b))
+        // set alpha
+        GL_CHECK(shininess = glGetUniformLocation(shader->programID(), "alpha"))
+        float value;
+        if (AI_SUCCESS == material->Get(AI_MATKEY_SHININESS, value)) {
+            GL_CHECK(glUniform1f(shininess, value))
+        } else {
+            GL_CHECK(glUniform1f(shininess, 30))
+        }
+    }
+
+
+}
+
+void RenderManager::setTextures(vector<TextureSet> &textures, aiMesh* mesh, Shader* shader)
+{
+    TextureSet& tex = textures[mesh->mMaterialIndex];
+    GLint diffuse, specular, normal, shadow, cube, inverseview;
+
+    if(shader->useDiffuse){
+        GL_CHECK(diffuse = glGetUniformLocation(shader->programID(), "diffuseTex"))
+        GL_CHECK(glUniform1i(diffuse, 0))
+        GL_CHECK(glActiveTexture(GL_TEXTURE0))
+        if(tex.diffuseExist){
+            tex.diffuse.Bind();
+            GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR))
+            GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR))
+            GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT))
+            GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT))
+        }
+        else{
+            GL_CHECK(glBindTexture(GL_TEXTURE_2D, 0))
+        }
+    }
+
+    if(shader->useSpecular){
+        GL_CHECK(specular = glGetUniformLocation(shader->programID(), "specularTex"))
+        GL_CHECK(glUniform1i(specular, 1))
+        GL_CHECK(glActiveTexture(GL_TEXTURE1))
+        if(tex.specularExist){
+            tex.specular.Bind();
+            GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR))
+            GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR))
+            GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT))
+            GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT))
+        }
+        else{
+            GL_CHECK(glBindTexture(GL_TEXTURE_2D, 0))
+        }
+    }
+
+    if(shader->useNormal){
+        GL_CHECK(normal = glGetUniformLocation(shader->programID(), "normalTex"))
+        GL_CHECK(glUniform1i(normal, 2))
+        GL_CHECK(glActiveTexture(GL_TEXTURE2))
+        if(tex.normalExist){
+            tex.normal.Bind();
+            GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR))
+            GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR))
+            GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT))
+            GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT))
+        }
+        else{
+            GL_CHECK(glBindTexture(GL_TEXTURE_2D, 0))
+        }
+    }
+
+    if(shader->useShadow){
+        GL_CHECK(shadow = glGetUniformLocation(shader->programID(), "shadowTex"))
+        GL_CHECK(glUniform1i(shadow, 7))
+        GL_CHECK(glActiveTexture(GL_TEXTURE7))
+        GL_CHECK(glBindTexture(GL_TEXTURE_2D, depthBuffer->textureID()))
+        GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE))
+        GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE))
+        
+        GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST))
+        GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST))
+    }
+
+    if(shader->useCube){
+        GL_CHECK(cube = glGetUniformLocation(shader->programID(), "cubeTex"))
+        GL_CHECK(glUniform1i(cube, 3))
+        GL_CHECK(glActiveTexture(GL_TEXTURE3))
+        GL_CHECK(glBindTexture(GL_TEXTURE_CUBE_MAP, tColorCubeMap))
+        GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR))
+        GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR))
+
+        GL_CHECK(inverseview = glGetUniformLocation(shader->programID(), "inverseView"))
+        GL_CHECK(glUniformMatrix4fv(inverseview, 1, false, inverseView))
+    }
+
+}
+
+void RenderManager::setMeshData(aiMesh* mesh, Shader* shader)
+{
+    GLint position, texcoord, normal, tangent, bitangent;
+
+    if(shader->usePosition){
+        // Get a handle to the variables for the vertex data inside the shader.
+        GL_CHECK(position = glGetAttribLocation(shader->programID(), "positionIn"))
+        GL_CHECK(glEnableVertexAttribArray(position))
+        GL_CHECK(glVertexAttribPointer(position, 3, GL_FLOAT, 0, sizeof(aiVector3D), mesh->mVertices))
+    }
+
+    if(shader->useDiffuse || shader->useSpecular){
+        // Texture coords.  Note the [0] at the end, very important
+        GL_CHECK(texcoord = glGetAttribLocation(shader->programID(), "texcoordIn"))
+        GL_CHECK(glEnableVertexAttribArray(texcoord))
+        GL_CHECK(glVertexAttribPointer(texcoord, 2, GL_FLOAT, 0, sizeof(aiVector3D), mesh->mTextureCoords[0]))
+    }
+
+    if(shader->useNormal){
+        // Normals
+        GL_CHECK(normal = glGetAttribLocation(shader->programID(), "normalIn"))
+        GL_CHECK(glEnableVertexAttribArray(normal))
+        GL_CHECK(glVertexAttribPointer(normal, 3, GL_FLOAT, 0, sizeof(aiVector3D), mesh->mNormals))
+    }
+
+    if(shader->useTangent){
+        // Tangent
+        GL_CHECK(tangent = glGetAttribLocation(shader->programID(), "tangentIn"))
+        GL_CHECK(glEnableVertexAttribArray(tangent))
+        GL_CHECK(glVertexAttribPointer(tangent, 3, GL_FLOAT, 0, sizeof(aiVector3D), mesh->mTangents))
+    }
+
+    if(shader->useBitangent){
+        // Bitangent
+        GL_CHECK(bitangent = glGetAttribLocation(shader->programID(), "bitangentIn"))
+        GL_CHECK(glEnableVertexAttribArray(bitangent))
+        GL_CHECK(glVertexAttribPointer(bitangent, 3, GL_FLOAT, 0, sizeof(aiVector3D), mesh->mBitangents))
+    }
+}
+
+void RenderManager::loadShaders()
+{
+    for(int i = 0; i < root->mNumOfShaders; i++){
+        char shaderPath[BUFFER_SIZE];
+        char relativePath[BUFFER_SIZE];
+        char shaderName[18];
+        sprintf(shaderName, "Shader %d", i);
+        GetPrivateProfileString(shaderName, "FileName", "", relativePath, BUFFER_SIZE, root->mConfigFileName.c_str());
+        strcpy(shaderPath, root->mRootPath.c_str());
+        strcat(shaderPath, relativePath);
+        shaders[i] = new Shader(shaderPath);
+        if(!shaders[i]->loaded()) {
+            std::cerr << "shader[" << i << "] failed to load" << std::endl;
+            std::cerr << shaders[i]->errors() << std::endl;
+            exit(-1);
+        }
+        printf("[RenderManager] shader %d loaded\n", i);
+        shaders[i]->initilize(shaderName, root->mConfigFileName.c_str());
+    }
+}
+
+void RenderManager::setCamera() {
+    // Set up the projection and model-view matrices
+    GLfloat aspectRatio = (GLfloat)window.GetWidth()/window.GetHeight();
+    GLfloat nearClip = 0.1f;
+    GLfloat farClip = 500.0f;
+    GLfloat fieldOfView = 45.0f; // Degrees
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(fieldOfView, aspectRatio, nearClip, farClip);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    gluLookAt(root->eye.x, root->eye.y, root->eye.z, 
+              root->target.x, root->target.y, root->target.z, 
+              root->up.x, root->up.y, root->up.z);
+
+    GLfloat v[16];
+    GL_CHECK(glGetFloatv(GL_MODELVIEW_MATRIX, v))
+    aiMatrix4x4 vm(v[0],v[4],v[8],v[12],
+                   v[1],v[5],v[9],v[13],
+                   v[2],v[6],v[10],v[14],
+                   v[3],v[7],v[11],v[15]);
+    vm.Inverse();
+    inverseView[0] = vm.a1; inverseView[4] = vm.a2; inverseView[8]  = vm.a3; inverseView[12] = vm.a4;
+    inverseView[1] = vm.b1; inverseView[5] = vm.b2; inverseView[9]  = vm.b3; inverseView[13] = vm.b4;
+    inverseView[2] = vm.c1; inverseView[6] = vm.c2; inverseView[10] = vm.c3; inverseView[14] = vm.c4;
+    inverseView[3] = vm.d1; inverseView[7] = vm.d2; inverseView[11] = vm.d3; inverseView[15] = vm.d4;
+}
+
+void RenderManager::setLight() {
+
+    for(int i = 0; i < root->mNumOfLights; i++){
+        glLightfv(GL_LIGHT0+i, GL_AMBIENT, root->light[i].ambient);
+        glLightfv(GL_LIGHT0+i, GL_DIFFUSE, root->light[i].diffuse);
+        glLightfv(GL_LIGHT0+i, GL_SPECULAR, root->light[i].specular);
+        glLightfv(GL_LIGHT0+i, GL_POSITION, root->light[i].position);
+    }
+}
+
+void RenderManager::setCameraForCube(GLuint face)
+{
+    GLfloat target[6][3] = {{1,0,0}, {-1,0,0}, {0,1,0}, 
+                        {0,-1,0}, {0,0,1}, {0,0,-1}};
+    GLfloat up[6][3] = {{0,-1,0}, {0,-1,0}, {0,0,1},
+                        {0,0,-1}, {0,-1,0}, {0,-1,0}};
+
+    // Set up the projection and model-view matrices
+    GLfloat aspectRatio = 1.0f;
+    GLfloat nearClip = 0.0001f;
+    GLfloat farClip = 500.0f;
+    GLfloat fieldOfView = 90.0f; // Degrees
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(fieldOfView, aspectRatio, nearClip, farClip);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    GLfloat eye_x = 0.f;
+    GLfloat eye_y = 2.f;
+    GLfloat eye_z = 0.f;
+    gluLookAt(eye_x, eye_y, eye_z, 
+              eye_x+target[face][0], eye_y+target[face][1], eye_z+target[face][2],
+              up[face][0], up[face][1], up[face][2]);
+}
+
+void RenderManager::renderCubeFaces(SceneNode &scene)
+{
+    float cubeSize = 800.0f;
+    GL_CHECK(glUseProgram(shaders[1]->programID()))
+    GL_CHECK(glEnable(GL_TEXTURE_CUBE_MAP))
+    GL_CHECK(glGenTexturesEXT(1, &tColorCubeMap))
+    GL_CHECK(glActiveTexture(GL_TEXTURE4))
+    GL_CHECK(glBindTexture(GL_TEXTURE_CUBE_MAP, tColorCubeMap))
+    GL_CHECK(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE))
+    GL_CHECK(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE))
+    GL_CHECK(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE))
+    GL_CHECK(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR))
+    GL_CHECK(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR))
+
+    for(GLuint face = 0; face < 6; face++){
+        GL_CHECK(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X+face, 0, GL_RGBA8, 
+            cubeSize, cubeSize, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL))
+        GL_CHECK(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT))
+        setCameraForCube(face);
+        GL_CHECK(setLight())
+        GL_CHECK(glViewport(0,0,cubeSize,cubeSize))
+        renderNode(scene.mScene->mRootNode, scene, shaders[1]);
+        GL_CHECK(glActiveTexture(GL_TEXTURE4))
+        GL_CHECK(glBindTexture(GL_TEXTURE_CUBE_MAP, tColorCubeMap))
+        GL_CHECK(glCopyTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X+face,0,0,0,0,0,cubeSize,cubeSize))
+    }
+
+}
+
