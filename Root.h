@@ -25,6 +25,7 @@ public:
     int    mNumOfScene;
     int    mNumOfShaders;
     int    mNumOfLights;
+    bool   mEnableAirplane;
 
     // Camera parameters
     aiVector3D eye;

@@ -64,6 +64,12 @@ void SceneManager::initializeWorld()
     root->up.y = GetPrivateProfileFloat("Initialization", "upY", 1.0f, root->mConfigFileName.c_str());
     root->up.z = GetPrivateProfileFloat("Initialization", "upZ", 0.0f, root->mConfigFileName.c_str());
 
+    flyDirection.x = GetPrivateProfileFloat("Initialization", "flyDirectionX", 1.0f, root->mConfigFileName.c_str());
+    flyDirection.y = GetPrivateProfileFloat("Initialization", "flyDirectionY", 0.0f, root->mConfigFileName.c_str());
+    flyDirection.z = GetPrivateProfileFloat("Initialization", "flyDirectionZ", 0.0f, root->mConfigFileName.c_str());
+    flySpeed      = GetPrivateProfileFloat("Initialization", "flySpeed", 1.0f, root->mConfigFileName.c_str());
+    rotationSpeed = GetPrivateProfileFloat("Initialization", "rotationSpeed", 11.0f, root->mConfigFileName.c_str());
+
     for(int i = 0; i < root->mNumOfLights; i++){
         Light l;
         char lightName[17];
@@ -93,8 +99,17 @@ void SceneManager::initializeWorld()
 void SceneManager::updateWorld()
 {
     // update airplane
-    if(airplaneClock.GetElapsedTime() > 0.05f){
+    if(root->mEnableAirplane && airplaneClock.GetElapsedTime() > 0.01f){
+        // translate airplane and airscrew
+        aiVector3D v = flyDirection;
+        v.Normalize();
+        v *= flySpeed;
+        mSceneNodes[1].mPosition += v;
+        mSceneNodes[2].mPosition += v;
+        
 
+        // rotate airscrew
+        mSceneNodes[2].rotate(rotationSpeed);
         airplaneClock.Reset();
     }
 

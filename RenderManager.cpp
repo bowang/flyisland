@@ -116,7 +116,7 @@ void RenderManager::renderNode(aiNode* node, SceneNode& scene, Shader* shader)
         GL_CHECK(setMaterial(scene.mScene, mesh, shader))
         GL_CHECK(setTextures(scene.mTexture, mesh, shader))
         GL_CHECK(setMeshData(mesh, shader))
-        GL_CHECK(glDrawElements(GL_TRIANGLES, 3*mesh->mNumFaces, GL_UNSIGNED_INT, &(scene.mIndexBuffer[node->mMeshes[i]][0])))
+        GL_CHECK(glDrawElements(GL_TRIANGLES, /*3*mesh->mNumFaces*/ scene.mIndexBuffer[node->mMeshes[i]].size(), GL_UNSIGNED_INT, &(scene.mIndexBuffer[node->mMeshes[i]][0])))
     }
 
     for(unsigned i = 0; i < node->mNumChildren; i++){

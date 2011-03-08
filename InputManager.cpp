@@ -79,6 +79,22 @@ void InputManager::handleInput()
         root->eye -= d;
     }
 
+    if(input.IsKeyDown(sf::Key::W)){
+
+    }
+
+    if(input.IsKeyDown(sf::Key::S)){
+
+    }
+
+    if(input.IsKeyDown(sf::Key::A)){
+
+    }
+
+    if(input.IsKeyDown(sf::Key::D)){
+
+    }
+
     if(mouseCaptureEnabled){
         mouseX = input.GetMouseX();
         mouseY = input.GetMouseY();

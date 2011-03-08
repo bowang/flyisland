@@ -120,3 +120,18 @@ bool SceneNode::useShader(int i)
     }
     return false;
 }
+
+void SceneNode::rotate(float ra)
+{
+    mRotateAngle += ra;
+    if(mRotateAngle > 360.0f)
+        mRotateAngle -= 360.0f;
+}
+
+void SceneNode::setRotateAxis(float rx, float ry, float rz)
+{
+    mRotate.x = rx;
+    mRotate.y = ry;
+    mRotate.z = rz;
+}
+

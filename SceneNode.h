@@ -27,6 +27,8 @@ public:
     void initialize(const char* sceneName, const char* configFileName);
     int  numShaders();
     bool useShader(int i);
+    void rotate(float ra);
+    void setRotateAxis(float rx, float ry, float rz);
 
 private:
     string mSceneName;

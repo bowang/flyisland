@@ -22,6 +22,10 @@ private:
     Root* root;
     sf::Clock airplaneClock;
 
+    float rotationSpeed;
+    float flySpeed;
+    aiVector3D flyDirection;
+
 protected:
 
 
