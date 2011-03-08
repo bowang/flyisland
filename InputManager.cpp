@@ -48,7 +48,7 @@ void InputManager::handleInput()
 
     const sf::Input& input = window.GetInput();
 
-    if(input.IsKeyDown(sf::Key::A)){
+    if(input.IsKeyDown(sf::Key::Left)){
         aiVector3D direction = root->target - root->eye;
         aiVector3D d = cross(root->up, direction);
         d.Normalize();
@@ -56,7 +56,7 @@ void InputManager::handleInput()
         root->target += d;
         root->eye += d;
     }
-    if(input.IsKeyDown(sf::Key::D)){
+    if(input.IsKeyDown(sf::Key::Right)){
         aiVector3D direction = root->target - root->eye;
         aiVector3D d = cross(root->up, direction);
         d.Normalize();
@@ -64,14 +64,14 @@ void InputManager::handleInput()
         root->target -= d;
         root->eye -= d;
     }
-    if(input.IsKeyDown(sf::Key::W)){
+    if(input.IsKeyDown(sf::Key::Up)){
         aiVector3D d = root->target - root->eye;
         d.Normalize();
         d *= delta;
         root->target += d;
         root->eye += d;
     }
-    if(input.IsKeyDown(sf::Key::S)){
+    if(input.IsKeyDown(sf::Key::Down)){
         aiVector3D d = root->target - root->eye;
         d.Normalize();
         d *= delta;
