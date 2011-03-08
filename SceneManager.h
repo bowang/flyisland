@@ -20,6 +20,7 @@ public:
 
 private:
     Root* root;
+    sf::Clock airplaneClock;
 
 protected:
 

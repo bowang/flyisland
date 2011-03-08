@@ -53,7 +53,7 @@ void RenderManager::renderFrame()
 
     // render skybox first
     renderSkyBox();
-
+    
     // render objects in the scene with different shaders
     for(int shaderIdx = 0; shaderIdx < root->mNumOfShaders; shaderIdx++){
         switch(shaderIdx){
@@ -81,7 +81,7 @@ void RenderManager::renderFrame()
             break;
         }
     }
-
+    
     // render particles here
 
 

@@ -87,9 +87,20 @@ void SceneManager::initializeWorld()
         root->light.push_back(l);
     }
 
+    airplaneClock.Reset();
 }
 
 void SceneManager::updateWorld()
 {
-    
+    // update airplane
+    if(airplaneClock.GetElapsedTime() > 0.05f){
+
+        airplaneClock.Reset();
+    }
+
+
+    // update airscrew
+
+
+
 }
