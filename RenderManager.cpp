@@ -405,12 +405,6 @@ void RenderManager::renderSkyBox()
     GL_CHECK(glPushMatrix())
     GL_CHECK(glLoadIdentity())
     GL_CHECK(gluLookAt(0,0,0, root->target.x-root->eye.x, root->target.y-root->eye.y, root->target.z-root->eye.z, 0,1,0))
-    /*
-    GL_CHECK(glMatrixMode(GL_PROJECTION))
-    GL_CHECK(glPushMatrix())
-    GL_CHECK(glLoadIdentity())
-    GL_CHECK(glFrustum(1,-1,-1,1,1,100))
-    */
 
     GL_CHECK(glPushAttrib(GL_ENABLE_BIT))
     GL_CHECK(glEnable(GL_TEXTURE_2D))
@@ -472,6 +466,8 @@ void RenderManager::renderSkyBox()
         glTexCoord2f(1, 1); glVertex3f(  0.5f,  0.5f, -0.5f );
     glEnd();
 
+    GL_CHECK(glEnable(GL_LIGHTING))
+    GL_CHECK(glDepthMask(GL_TRUE))
     GL_CHECK(glPopAttrib())
     GL_CHECK(glPopMatrix())
 }
