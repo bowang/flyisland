@@ -6,6 +6,7 @@ extern sf::RenderWindow window;
 InputManager::InputManager(Root* root)
 {
     this->root = root;
+    delta = GetPrivateProfileFloat("Input", "delta", 1.0f, root->mConfigFileName.c_str());
     mouseCaptureEnabled = false;
 }
 
@@ -28,6 +29,7 @@ void InputManager::handleInput()
             default:
                 break;
             }
+            break;
         case sf::Event::MouseButtonPressed:
             v = root->target - root->eye;
             lenxz = sqrt(v.x*v.x+v.z*v.z);
@@ -45,6 +47,37 @@ void InputManager::handleInput()
     }
 
     const sf::Input& input = window.GetInput();
+
+    if(input.IsKeyDown(sf::Key::A)){
+        aiVector3D direction = root->target - root->eye;
+        aiVector3D d = cross(root->up, direction);
+        d.Normalize();
+        d *= delta;
+        root->target += d;
+        root->eye += d;
+    }
+    if(input.IsKeyDown(sf::Key::D)){
+        aiVector3D direction = root->target - root->eye;
+        aiVector3D d = cross(root->up, direction);
+        d.Normalize();
+        d *= delta;
+        root->target -= d;
+        root->eye -= d;
+    }
+    if(input.IsKeyDown(sf::Key::W)){
+        aiVector3D d = root->target - root->eye;
+        d.Normalize();
+        d *= delta;
+        root->target += d;
+        root->eye += d;
+    }
+    if(input.IsKeyDown(sf::Key::S)){
+        aiVector3D d = root->target - root->eye;
+        d.Normalize();
+        d *= delta;
+        root->target -= d;
+        root->eye -= d;
+    }
 
     if(mouseCaptureEnabled){
         mouseX = input.GetMouseX();

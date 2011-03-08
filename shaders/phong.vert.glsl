@@ -3,14 +3,14 @@
 attribute vec3 positionIn;
 attribute vec2 texcoordIn;
 attribute vec3 normalIn;
-attribute vec3 tangentIn;
-attribute vec3 bitangentIn;
+// attribute vec3 tangentIn;
+// attribute vec3 bitangentIn;
 
+varying vec3 eyePosition;
 varying vec2 texcoord;
 varying vec3 normal;
-varying vec3 tangent;
-varying vec3 bitangent;
-varying vec3 eyePosition;
+// varying vec3 tangent;
+// varying vec3 bitangent;
 // varying vec4 shadowcoord;
 
 void main() {
@@ -30,7 +30,7 @@ void main() {
 */
 
     normal    = gl_NormalMatrix * normalIn;
-    tangent   = tangentIn;
-    bitangent = bitangentIn;
+//    tangent   = tangentIn;
+//    bitangent = bitangentIn;
     texcoord  = texcoordIn;
 }

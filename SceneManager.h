@@ -16,6 +16,7 @@ public:
     void updateWorld();
     vector<SceneNode> mSceneNodes;
     vector<BoundingBox> mBoundingBox;
+    sf::Image mSkybox[5];
 
 private:
     Root* root;

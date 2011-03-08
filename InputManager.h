@@ -18,6 +18,7 @@ private:
     int mouseX0, mouseY0, mouseX, mouseY;
     float yaw, pitch;
     float lenxz, lenxy;
+    float delta;
 
 protected:
 

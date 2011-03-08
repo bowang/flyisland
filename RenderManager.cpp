@@ -44,16 +44,29 @@ void RenderManager::initOpenGL()
 
 void RenderManager::preprocess()
 {
-    renderCubeFaces(root->mSceneManager->mSceneNodes[0]);
+    // renderCubeFaces(root->mSceneManager->mSceneNodes[0]);
 }
 
 void RenderManager::renderFrame() 
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    // render skybox first
+    renderSkyBox();
+
+    // render objects in the scene with different shaders
     for(int shaderIdx = 0; shaderIdx < root->mNumOfShaders; shaderIdx++){
         switch(shaderIdx){
         // Perform OpenGL initialization for the particular shader
+        case 0:
+            GL_CHECK(glUseProgram(shaders[shaderIdx]->programID()))
+            GL_CHECK(glViewport(0, 0, window.GetWidth(), window.GetHeight()))
+            GL_CHECK(setCamera())
+            GL_CHECK(setLight())
+            for(int i = 0; i < root->mSceneManager->mSceneNodes.size(); i++){
+                renderScene(root->mSceneManager->mSceneNodes[i], shaderIdx);
+            }
+            break;
 
         case 2:
             GL_CHECK(glUseProgram(shaders[shaderIdx]->programID()))
@@ -64,18 +77,14 @@ void RenderManager::renderFrame()
             }
             break;
 
-        default:  // Phong shader is set as the default shader
-            GL_CHECK(glUseProgram(shaders[shaderIdx]->programID()))
-            GL_CHECK(glViewport(0, 0, window.GetWidth(), window.GetHeight()))
-            GL_CHECK(setCamera())
-            GL_CHECK(setLight())
-            GL_CHECK(glCullFace(GL_BACK))
-            for(int i = 0; i < root->mSceneManager->mSceneNodes.size(); i++){
-                renderScene(root->mSceneManager->mSceneNodes[i], shaderIdx);
-            }
+        default:
             break;
         }
     }
+
+    // render particles here
+
+
 }
 
 void RenderManager::renderScene(SceneNode& scene, int shaderIdx)
@@ -297,7 +306,7 @@ void RenderManager::setCamera() {
     // Set up the projection and model-view matrices
     GLfloat aspectRatio = (GLfloat)window.GetWidth()/window.GetHeight();
     GLfloat nearClip = 0.1f;
-    GLfloat farClip = 500.0f;
+    GLfloat farClip = 5000.0f;
     GLfloat fieldOfView = 45.0f; // Degrees
 
     glMatrixMode(GL_PROJECTION);
@@ -385,5 +394,85 @@ void RenderManager::renderCubeFaces(SceneNode &scene)
         GL_CHECK(glCopyTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X+face,0,0,0,0,0,cubeSize,cubeSize))
     }
 
+}
+
+void RenderManager::renderSkyBox()
+{
+    GL_CHECK(glUseProgram(0))
+    
+    GL_CHECK(glViewport(0,0,window.GetWidth(),window.GetHeight()))
+    GL_CHECK(glMatrixMode(GL_MODELVIEW))
+    GL_CHECK(glPushMatrix())
+    GL_CHECK(glLoadIdentity())
+    GL_CHECK(gluLookAt(0,0,0, root->target.x-root->eye.x, root->target.y-root->eye.y, root->target.z-root->eye.z, 0,1,0))
+    /*
+    GL_CHECK(glMatrixMode(GL_PROJECTION))
+    GL_CHECK(glPushMatrix())
+    GL_CHECK(glLoadIdentity())
+    GL_CHECK(glFrustum(1,-1,-1,1,1,100))
+    */
+
+    GL_CHECK(glPushAttrib(GL_ENABLE_BIT))
+    GL_CHECK(glEnable(GL_TEXTURE_2D))
+    //GL_CHECK(glDisable(GL_DEPTH_TEST))
+    GL_CHECK(glDepthMask(GL_FALSE))
+    GL_CHECK(glDisable(GL_LIGHTING))
+    GL_CHECK(glDisable(GL_BLEND))
+    GL_CHECK(glColor4f(1,1,1,1))
+
+    GL_CHECK(glActiveTexture(GL_TEXTURE0))
+    root->mSceneManager->mSkybox[0].Bind();
+    GL_CHECK(glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE))
+    GL_CHECK(glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE))
+    glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f(  0.5f, -0.5f, -0.5f );
+        glTexCoord2f(1, 0); glVertex3f( -0.5f, -0.5f, -0.5f );
+        glTexCoord2f(1, 1); glVertex3f( -0.5f,  0.5f, -0.5f );
+        glTexCoord2f(0, 1); glVertex3f(  0.5f,  0.5f, -0.5f );
+    glEnd();
+
+    root->mSceneManager->mSkybox[1].Bind();
+    GL_CHECK(glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE))
+    GL_CHECK(glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE))
+    glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f(  0.5f, -0.5f,  0.5f );
+        glTexCoord2f(1, 0); glVertex3f(  0.5f, -0.5f, -0.5f );
+        glTexCoord2f(1, 1); glVertex3f(  0.5f,  0.5f, -0.5f );
+        glTexCoord2f(0, 1); glVertex3f(  0.5f,  0.5f,  0.5f );
+    glEnd();
+
+    root->mSceneManager->mSkybox[2].Bind();
+    GL_CHECK(glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE))
+    GL_CHECK(glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE))
+    glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f( -0.5f, -0.5f,  0.5f );
+        glTexCoord2f(1, 0); glVertex3f(  0.5f, -0.5f,  0.5f );
+        glTexCoord2f(1, 1); glVertex3f(  0.5f,  0.5f,  0.5f );
+        glTexCoord2f(0, 1); glVertex3f( -0.5f,  0.5f,  0.5f );
+ 
+    glEnd();
+
+    root->mSceneManager->mSkybox[3].Bind();
+    GL_CHECK(glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE))
+    GL_CHECK(glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE))
+    glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f( -0.5f, -0.5f, -0.5f );
+        glTexCoord2f(1, 0); glVertex3f( -0.5f, -0.5f,  0.5f );
+        glTexCoord2f(1, 1); glVertex3f( -0.5f,  0.5f,  0.5f );
+        glTexCoord2f(0, 1); glVertex3f( -0.5f,  0.5f, -0.5f );
+    glEnd();
+
+    root->mSceneManager->mSkybox[4].Bind();
+    GL_CHECK(glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE))
+    GL_CHECK(glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE))
+    glBegin(GL_QUADS);
+        glTexCoord2f(0, 1); glVertex3f( -0.5f,  0.5f, -0.5f );
+        glTexCoord2f(0, 0); glVertex3f( -0.5f,  0.5f,  0.5f );
+        glTexCoord2f(1, 0); glVertex3f(  0.5f,  0.5f,  0.5f );
+        glTexCoord2f(1, 1); glVertex3f(  0.5f,  0.5f, -0.5f );
+    glEnd();
+
+    GL_CHECK(glPopAttrib())
+    GL_CHECK(glPopMatrix())
 }
 

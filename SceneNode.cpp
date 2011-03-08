@@ -32,22 +32,23 @@ void SceneNode::loadTextures()
         aiMaterial* material = mScene->mMaterials[i];
 
         material->GetTexture(aiTextureType_DIFFUSE, 0, &filename);
-        path.Set(prefix); path.Append(filename.data); path.Append("_d.jpg");
+        path.Set(prefix); path.Append(filename.data); // path.Append("_d.jpg");
         mTexture[i].diffuseExist = mTexture[i].diffuse.LoadFromFile(path.data);
         if(mTexture[i].diffuseExist)
             printf("[SceneNode] Diffuse texture loaded: %s\n", path.data);
 
         material->GetTexture(aiTextureType_SPECULAR, 0, &filename);
-        path.Set(prefix); path.Append(filename.data); path.Append("_s.jpg");
+        path.Set(prefix); path.Append(filename.data); // path.Append("_s.jpg");
         mTexture[i].specularExist = mTexture[i].specular.LoadFromFile(path.data);
         if(mTexture[i].specularExist)
             printf("[SceneNode] Specular texture loaded: %s\n", path.data);
 
         material->GetTexture(aiTextureType_NORMALS, 0, &filename);
-        path.Set(prefix); path.Append(filename.data); path.Append("_n.jpg");
+        path.Set(prefix); path.Append(filename.data); // path.Append("_n.jpg");
         mTexture[i].normalExist = mTexture[i].normal.LoadFromFile(path.data);
         if(mTexture[i].normalExist)
             printf("[SceneNode] Normal texture loaded: %s\n", path.data);
+
     }
 
     delete[] prefix;

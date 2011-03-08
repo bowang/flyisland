@@ -7,6 +7,8 @@ SceneManager::SceneManager(Root* root)
     mSceneNodes.resize(root->mNumOfScene);
 }
 
+char skyName[5][6] = {"Front", "Left", "Back", "Right", "Top"};
+
 void SceneManager::loadAssets() 
 {
     for(int i = 0; i < root->mNumOfScene; i++){
@@ -33,6 +35,21 @@ void SceneManager::loadAssets()
 
         mSceneNodes[i].initialize(sceneName, root->mConfigFileName.c_str());
     }
+
+    // load images for skybox
+    for(int i = 0; i < 5; i++){
+        char fileName[BUFFER_SIZE];
+        char skyPath[2*BUFFER_SIZE];
+        GetPrivateProfileString("Sky", skyName[i], "", fileName, BUFFER_SIZE, root->mConfigFileName.c_str());
+        strcpy(skyPath, root->mRootPath.c_str());    strcat(skyPath, fileName);
+        bool success = mSkybox[i].LoadFromFile(skyPath);
+        if(!success){
+            printf("Failed to load skybox (top) from %s\n", skyPath);
+            exit(-1);
+        }
+        else printf("[SceneManager] Loading sky(top): %s\n", skyPath);
+    }
+
 }
 
 void SceneManager::initializeWorld()

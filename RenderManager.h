@@ -33,6 +33,7 @@ private:
 
     void renderCubeFaces(SceneNode &scene);
     void setCameraForCube(GLuint face);
+    void renderSkyBox();
 
     GLuint tColorCubeMap;
 
