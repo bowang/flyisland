@@ -15,6 +15,10 @@ Root::Root(string configFileName)
     mSceneManager = new SceneManager(this);
     mRenderManager = new RenderManager(this);
     mInputManager = new InputManager(this);
+    if(mEnableAirplane)
+        viewMode = FlyView;
+    else
+        viewMode = FreeView;
 }
 
 bool Root::loadConfigFile()
@@ -43,6 +47,7 @@ void Root::run()
 {
     mRenderManager->initOpenGL();
 
+    // first loadAssets, then initializeWorld, otherwise flyDirection is not correct
     mSceneManager->loadAssets();
     mSceneManager->initializeWorld();
 

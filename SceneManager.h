@@ -18,13 +18,19 @@ public:
     vector<BoundingBox> mBoundingBox;
     sf::Image mSkybox[5];
 
-private:
-    Root* root;
-    sf::Clock airplaneClock;
-
     float rotationSpeed;
     float flySpeed;
     aiVector3D flyDirection;
+    aiVector3D pitchAxis;
+    aiVector3D yawAxis;
+    float pitch;
+    float yaw;
+
+private:
+    Root* root;
+    sf::Clock airplaneClock;
+    sf::Clock cameraClock;
+    void updateAirplane();
 
 protected:
 

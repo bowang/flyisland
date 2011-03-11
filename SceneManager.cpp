@@ -33,7 +33,7 @@ void SceneManager::loadAssets()
             exit(-1);
         }
 
-        mSceneNodes[i].initialize(sceneName, root->mConfigFileName.c_str());
+        mSceneNodes[i].initialize(i, root->mConfigFileName.c_str());
     }
 
     // load images for skybox
@@ -64,11 +64,18 @@ void SceneManager::initializeWorld()
     root->up.y = GetPrivateProfileFloat("Initialization", "upY", 1.0f, root->mConfigFileName.c_str());
     root->up.z = GetPrivateProfileFloat("Initialization", "upZ", 0.0f, root->mConfigFileName.c_str());
 
-    flyDirection.x = GetPrivateProfileFloat("Initialization", "flyDirectionX", 1.0f, root->mConfigFileName.c_str());
-    flyDirection.y = GetPrivateProfileFloat("Initialization", "flyDirectionY", 0.0f, root->mConfigFileName.c_str());
-    flyDirection.z = GetPrivateProfileFloat("Initialization", "flyDirectionZ", 0.0f, root->mConfigFileName.c_str());
-    flySpeed      = GetPrivateProfileFloat("Initialization", "flySpeed", 1.0f, root->mConfigFileName.c_str());
-    rotationSpeed = GetPrivateProfileFloat("Initialization", "rotationSpeed", 11.0f, root->mConfigFileName.c_str());
+    if(root->mEnableAirplane){
+        root->airplane = &(mSceneNodes[0]);
+        root->airscrew = &(mSceneNodes[1]);
+        flyDirection.x = GetPrivateProfileFloat("Initialization", "flyDirectionX", 1.0f, root->mConfigFileName.c_str());
+        flyDirection.y = GetPrivateProfileFloat("Initialization", "flyDirectionY", 0.0f, root->mConfigFileName.c_str());
+        flyDirection.z = GetPrivateProfileFloat("Initialization", "flyDirectionZ", 0.0f, root->mConfigFileName.c_str());
+        flyDirection.x += root->airplane->mPosition.x;
+        flyDirection.y += root->airplane->mPosition.y;
+        flyDirection.z += root->airplane->mPosition.z;
+        flySpeed      = GetPrivateProfileFloat("Initialization", "flySpeed", 1.0f, root->mConfigFileName.c_str());
+        rotationSpeed = GetPrivateProfileFloat("Initialization", "rotationSpeed", 11.0f, root->mConfigFileName.c_str());
+    }
 
     for(int i = 0; i < root->mNumOfLights; i++){
         Light l;
@@ -100,22 +107,53 @@ void SceneManager::updateWorld()
 {
     // update airplane
     if(root->mEnableAirplane && airplaneClock.GetElapsedTime() > 0.01f){
-        // translate airplane and airscrew
-        aiVector3D v = flyDirection;
-        v.Normalize();
-        v *= flySpeed;
-        mSceneNodes[1].mPosition += v;
-        mSceneNodes[2].mPosition += v;
-        
-
-        // rotate airscrew
-        mSceneNodes[2].rotate(rotationSpeed);
+        updateAirplane();
         airplaneClock.Reset();
     }
 
+    // update camera
+    if(root->mEnableAirplane && cameraClock.GetElapsedTime() > 0.01f){
+        if(root->viewMode==FollowView){
+            aiVector3D d = root->target - root->airplane->mPosition;
+            root->target = root->airplane->mPosition;
+            root->eye -= d;
+        }
+        else if(root->viewMode==FlyView){
+            aiVector3D v = flyDirection - root->airplane->mPosition;
+            v.Normalize();
+            root->target = root->airplane->mPosition;
+            root->eye = root->airplane->mPosition - v*40.0f;
+        }
+        cameraClock.Reset();
+    }
+}
 
-    // update airscrew
+void SceneManager::updateAirplane()
+{
+    // translate airplane and airscrew
+    aiVector3D v = flyDirection - root->airplane->mPosition;
+    v.Normalize();
+    aiVector3D h = aiVector3D(v.x, 0.0f, v.z);
+    h.Normalize();
+    pitchAxis = cross(v, root->up);
+    pitch = 0.0f;
+    if(v.y != 0.0f){
+        pitch = fabs(v.y)/v.y*acos(dot(v,h))/Pi*180.0f;
+    }
+    yawAxis = root->up;
+    yaw = 0.0f;
+    if(v.z != 0.0f)
+        yaw = -fabs(v.z)/v.z*acos(dot(h,aiVector3D(1.f,0.f,0.f)))/Pi*180.0f;
 
+    v *= flySpeed;
+    root->airplane->mPosition += v;
+    root->airscrew->mPosition += v;
+    flyDirection += v;
 
+    // rotate airscrew
+    root->airscrew->rotateIncrease(rotationSpeed);
 
+    // rotate airplane
+    // root->airplane->setRotateAxis(v);
+    // root->airplane->rotate(-yaw);
 }

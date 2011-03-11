@@ -22,13 +22,16 @@ public:
     Assimp::Importer mImporter;
     vector<TextureSet> mTexture;
     vector< vector<unsigned> >   mIndexBuffer;
+    int index;
 
     bool ReadFile(const std::string &pFile, unsigned int pFlags);
-    void initialize(const char* sceneName, const char* configFileName);
+    void initialize(int i, const char* configFileName);
     int  numShaders();
     bool useShader(int i);
-    void rotate(float ra);
+    void rotate(float angle);
+    void rotateIncrease(float angleIncrement);
     void setRotateAxis(float rx, float ry, float rz);
+    void setRotateAxis(aiVector3D v);
 
 private:
     string mSceneName;

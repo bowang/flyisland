@@ -97,14 +97,20 @@ void SceneNode::buildIndexBuffer()
             }
         }
         mIndexBuffer.push_back(iBuffer);
+        if(!mesh->HasTextureCoords(0)){
+            printf("mesh[%d] has not texture coordinates.\n", i);
+        }
     }
     printf("[SceneNode] Index buffers built: %s (%d meshes)\n", mSceneName.c_str(), mIndexBuffer.size());
 }
 
-void SceneNode::initialize(const char* sceneName, const char* configFileName)
+void SceneNode::initialize(int i, const char* configFileName)
 {
+    index = i;
     buildIndexBuffer();
     loadTextures();
+    char sceneName[17];
+    sprintf(sceneName, "Scene %d", i);
     loadParameters(sceneName, configFileName);
 }
 
@@ -121,10 +127,17 @@ bool SceneNode::useShader(int i)
     return false;
 }
 
-void SceneNode::rotate(float ra)
+void SceneNode::rotateIncrease(float angleIncrement)
 {
-    mRotateAngle += ra;
-    if(mRotateAngle > 360.0f)
+    mRotateAngle += angleIncrement;
+    while(mRotateAngle > 360.0f)
+        mRotateAngle -= 360.0f;
+}
+
+void SceneNode::rotate(float angle)
+{
+    mRotateAngle = angle;
+    while(mRotateAngle > 360.0f)
         mRotateAngle -= 360.0f;
 }
 
@@ -133,5 +146,10 @@ void SceneNode::setRotateAxis(float rx, float ry, float rz)
     mRotate.x = rx;
     mRotate.y = ry;
     mRotate.z = rz;
+}
+
+void SceneNode::setRotateAxis(aiVector3D v)
+{
+    mRotate = v;
 }
 

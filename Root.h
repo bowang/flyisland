@@ -13,6 +13,12 @@ struct Light{
     float specular[4];
 };
 
+enum ViewMode{
+    FlyView = 0,
+    FollowView = 1,
+    FreeView = 2
+};
+
 class Root
 {
 public:
@@ -31,9 +37,14 @@ public:
     aiVector3D eye;
     aiVector3D target;
     aiVector3D up;
+    ViewMode viewMode;
 
     // Light parameters
     vector<Light> light;
+
+    // Airplane parameters
+    SceneNode* airplane;
+    SceneNode* airscrew;
 
     SceneManager*  mSceneManager;
     RenderManager* mRenderManager;

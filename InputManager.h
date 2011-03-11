@@ -19,6 +19,8 @@ private:
     float yaw, pitch;
     float lenxz, lenxy;
     float delta;
+    float dPitch;
+    float dYaw;
 
 protected:
 

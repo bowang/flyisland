@@ -6,7 +6,9 @@ extern sf::RenderWindow window;
 InputManager::InputManager(Root* root)
 {
     this->root = root;
-    delta = GetPrivateProfileFloat("Input", "delta", 1.0f, root->mConfigFileName.c_str());
+    delta  = GetPrivateProfileFloat("Input", "delta", 1.0f, root->mConfigFileName.c_str());
+    dPitch = GetPrivateProfileFloat("Input", "dPitch", 0.0f, root->mConfigFileName.c_str());
+    dYaw   = GetPrivateProfileFloat("Input", "dYaw", 0.0f, root->mConfigFileName.c_str());
     mouseCaptureEnabled = false;
 }
 
@@ -25,6 +27,15 @@ void InputManager::handleInput()
             switch (evt.Key.Code) {
             case sf::Key::Escape:
                 exit(0);
+                break;
+            case sf::Key::C:
+                root->viewMode = (enum ViewMode)((int(root->viewMode)+1)%3);
+                if(root->viewMode==FlyView)
+                    printf("CameraMode: FlyView\n");
+                else if(root->viewMode==FollowView)
+                    printf("CameraMode: FollowView\n");
+                else
+                    printf("CameraMode: FreeView\n");
                 break;
             default:
                 break;
@@ -48,51 +59,158 @@ void InputManager::handleInput()
 
     const sf::Input& input = window.GetInput();
 
-    if(input.IsKeyDown(sf::Key::Left)){
-        aiVector3D direction = root->target - root->eye;
-        aiVector3D d = cross(root->up, direction);
-        d.Normalize();
-        d *= delta;
-        root->target += d;
-        root->eye += d;
+    // free viewer
+    if(root->viewMode==FreeView){
+        if(input.IsKeyDown(sf::Key::Left)){
+            aiVector3D direction = root->target - root->eye;
+            aiVector3D d = cross(root->up, direction);
+            d.Normalize();
+            d *= delta;
+            root->target += d;
+            root->eye += d;
+        }
+        if(input.IsKeyDown(sf::Key::Right)){
+            aiVector3D direction = root->target - root->eye;
+            aiVector3D d = cross(root->up, direction);
+            d.Normalize();
+            d *= delta;
+            root->target -= d;
+            root->eye -= d;
+        }
+        if(input.IsKeyDown(sf::Key::Up)){
+            aiVector3D d = root->target - root->eye;
+            d.Normalize();
+            d *= delta;
+            root->target += d;
+            root->eye += d;
+        }
+        if(input.IsKeyDown(sf::Key::Down)){
+            aiVector3D d = root->target - root->eye;
+            d.Normalize();
+            d *= delta;
+            root->target -= d;
+            root->eye -= d;
+        }
     }
-    if(input.IsKeyDown(sf::Key::Right)){
-        aiVector3D direction = root->target - root->eye;
-        aiVector3D d = cross(root->up, direction);
-        d.Normalize();
-        d *= delta;
-        root->target -= d;
-        root->eye -= d;
+    // airplane mode
+    else if(root->viewMode==FollowView){
+        if(input.IsKeyDown(sf::Key::Left)){
+            aiVector3D direction = root->target - root->eye;
+            aiVector3D d = cross(root->up, direction);
+            d.Normalize();
+            d *= delta;
+            root->eye += d;
+        }
+        if(input.IsKeyDown(sf::Key::Right)){
+            aiVector3D direction = root->target - root->eye;
+            aiVector3D d = cross(root->up, direction);
+            d.Normalize();
+            d *= delta;
+            root->eye -= d;
+        }
+        if(input.IsKeyDown(sf::Key::Up)){
+            aiVector3D d = root->target - root->eye;
+            d.Normalize();
+            d *= delta;
+            root->eye += d;
+        }
+        if(input.IsKeyDown(sf::Key::Down)){
+            aiVector3D d = root->target - root->eye;
+            d.Normalize();
+            d *= delta;
+            root->eye -= d;
+        }
     }
-    if(input.IsKeyDown(sf::Key::Up)){
-        aiVector3D d = root->target - root->eye;
-        d.Normalize();
-        d *= delta;
-        root->target += d;
-        root->eye += d;
-    }
-    if(input.IsKeyDown(sf::Key::Down)){
-        aiVector3D d = root->target - root->eye;
-        d.Normalize();
-        d *= delta;
-        root->target -= d;
-        root->eye -= d;
+    else if(root->viewMode==FlyView){
+        // nothing need to be done, camera is fixed behind the plane
     }
 
     if(input.IsKeyDown(sf::Key::W)){
-
+        aiVector3D v = root->mSceneManager->flyDirection - root->airplane->mPosition;
+        if(v.Length() > 0.00001f) v.Normalize();
+        aiVector3D h = aiVector3D(v.x, 0.0f, v.z);
+        if(h.Length() > 0.00001f) h.Normalize();
+        float pitch = 0.0f;
+        if(v.y != 0.0f)
+            pitch = fabs(v.y)/v.y*acos(dot(v,h))/Pi*180.0f;
+        if(pitch > -60.0f)
+            pitch -= dPitch;
+        pitch = pitch/180.0f*Pi;
+        float yaw = 0.0f;
+        if(v.z != 0.0f)
+            yaw = fabs(v.z)/v.z*acos(dot(h,aiVector3D(1.f,0.f,0.f)))/Pi*180.0f;
+        yaw = yaw/180.0f*Pi;
+        v.y = sin(pitch);
+        float lenxz = cos(pitch);
+        v.x = lenxz * cos(yaw);
+        v.z = lenxz * sin(yaw);
+        root->mSceneManager->flyDirection = root->airplane->mPosition + v;
     }
 
     if(input.IsKeyDown(sf::Key::S)){
-
-    }
-
-    if(input.IsKeyDown(sf::Key::A)){
-
+        aiVector3D v = root->mSceneManager->flyDirection - root->airplane->mPosition;
+        if(v.Length() > 0.00001f) v.Normalize();
+        aiVector3D h = aiVector3D(v.x, 0.0f, v.z);
+        if(h.Length() > 0.00001f) h.Normalize();
+        float pitch = 0.0f;
+        if(v.y != 0.0f)
+            pitch = fabs(v.y)/v.y*acos(dot(v,h))/Pi*180.0f;
+        if(pitch < 60.0f)
+            pitch += dPitch;
+        pitch = pitch/180.0f*Pi;
+        float yaw = 0.0f;
+        if(v.z != 0.0f)
+            yaw = fabs(v.z)/v.z*acos(dot(h,aiVector3D(1.f,0.f,0.f)))/Pi*180.0f;
+        yaw = yaw/180.0f*Pi;
+        v.y = sin(pitch);
+        float lenxz = cos(pitch);
+        v.x = lenxz * cos(yaw);
+        v.z = lenxz * sin(yaw);
+        root->mSceneManager->flyDirection = root->airplane->mPosition + v;
     }
 
     if(input.IsKeyDown(sf::Key::D)){
+        aiVector3D v = root->mSceneManager->flyDirection - root->airplane->mPosition;
+        v.Normalize();
+        aiVector3D h = aiVector3D(v.x, 0.0f, v.z);
+        h.Normalize();
+        float pitch = 0.0f;
+        if(v.y != 0.0f)
+            pitch = fabs(v.y)/v.y*acos(dot(v,h))/Pi*180.0f;
+        pitch = pitch/180.0f*Pi;
+        float yaw = 0.0f;
+        if(v.z != 0.0f)
+            yaw = fabs(v.z)/v.z*acos(dot(h,aiVector3D(1.f,0.f,0.f)))/Pi*180.0f;
+        //if(yaw < 175.0f)
+            yaw += dYaw;
+        yaw = yaw/180.0f*Pi;
+        v.y = sin(pitch);
+        float lenxz = cos(pitch);
+        v.x = lenxz * cos(yaw);
+        v.z = lenxz * sin(yaw);
+        root->mSceneManager->flyDirection = root->airplane->mPosition + v;
+    }
 
+    if(input.IsKeyDown(sf::Key::A)){
+        aiVector3D v = root->mSceneManager->flyDirection - root->airplane->mPosition;
+        v.Normalize();
+        aiVector3D h = aiVector3D(v.x, 0.0f, v.z);
+        h.Normalize();
+        float pitch = 0.0f;
+        if(v.y != 0.0f)
+            pitch = fabs(v.y)/v.y*acos(dot(v,h))/Pi*180.0f;
+        pitch = pitch/180.0f*Pi;
+        float yaw = 0.0f;
+        if(v.z != 0.0f)
+            yaw = fabs(v.z)/v.z*acos(dot(h,aiVector3D(1.f,0.f,0.f)))/Pi*180.0f;
+        //if(yaw > -175.0f)
+            yaw -= dYaw;
+        yaw = yaw/180.0f*Pi;
+        v.y = sin(pitch);
+        float lenxz = cos(pitch);
+        v.x = lenxz * cos(yaw);
+        v.z = lenxz * sin(yaw);
+        root->mSceneManager->flyDirection = root->airplane->mPosition + v;
     }
 
     if(mouseCaptureEnabled){
@@ -102,9 +220,16 @@ void InputManager::handleInput()
         float dpitch = 2*Pi*float(mouseY - mouseY0)/window.GetHeight();
         yaw += dyaw;
         pitch += dpitch;
-        root->target.x = root->eye.x + fabs(v.x)/v.x*lenxz*cos(yaw);
-        root->target.y = root->eye.y - lenxy*sin(pitch);
-        root->target.z = root->eye.z + lenxz*sin(yaw);
+        if(!root->mEnableAirplane){
+            root->target.x = root->eye.x + fabs(v.x)/v.x*lenxz*cos(yaw);
+            root->target.y = root->eye.y - lenxy*sin(pitch);
+            root->target.z = root->eye.z + lenxz*sin(yaw);
+        }
+        else{
+            root->eye.x = root->target.x - fabs(v.x)/v.x*lenxz*cos(yaw);
+            root->eye.y = root->target.y + lenxy*sin(pitch);
+            root->eye.z = root->target.z - lenxz*sin(yaw);
+        }
         mouseX0 = mouseX;
         mouseY0 = mouseY;
     }

@@ -72,7 +72,7 @@ void RenderManager::renderFrame()
             GL_CHECK(glUseProgram(shaders[shaderIdx]->programID()))
             GL_CHECK(glViewport(0, 0, window.GetWidth(), window.GetHeight()))
             GL_CHECK(setCamera())
-            for(int i = 0; i < root->mSceneManager->mSceneNodes.size(); i++){
+            for(int i = 0; i < root->mNumOfScene; i++){
                 renderScene(root->mSceneManager->mSceneNodes[i], shaderIdx);
             }
             break;
@@ -90,12 +90,38 @@ void RenderManager::renderFrame()
 void RenderManager::renderScene(SceneNode& scene, int shaderIdx)
 {
     GL_CHECK(glPushMatrix())
+    // airplane need more rotations
+    if(root->mEnableAirplane && &scene==root->airplane){
+        GL_CHECK(glTranslatef(scene.mPosition.x, scene.mPosition.y, scene.mPosition.z))
+        aiVector3D& pitchAxis = root->mSceneManager->pitchAxis;
+        GL_CHECK(glRotatef(root->mSceneManager->pitch, pitchAxis.x, pitchAxis.y, pitchAxis.z))
+        aiVector3D& yawAxis = root->mSceneManager->yawAxis;
+        GL_CHECK(glRotatef(root->mSceneManager->yaw, yawAxis.x, yawAxis.y, yawAxis.z))
+        GL_CHECK(glRotatef(scene.mRotateAngle, scene.mRotate.x, scene.mRotate.y, scene.mRotate.z))
+        GL_CHECK(glScalef(scene.mScale.x, scene.mScale.y, scene.mScale.z))
+        if(scene.useShader(shaderIdx))
+            renderNode(scene.mScene->mRootNode, scene, shaders[shaderIdx]);
 
-    GL_CHECK(glTranslatef(scene.mPosition.x, scene.mPosition.y, scene.mPosition.z))
-    GL_CHECK(glRotatef(scene.mRotateAngle, scene.mRotate.x, scene.mRotate.y, scene.mRotate.z))
-    GL_CHECK(glScalef(scene.mScale.x, scene.mScale.y, scene.mScale.z))
-    if(scene.useShader(shaderIdx))
-        renderNode(scene.mScene->mRootNode, scene, shaders[shaderIdx]);
+    }
+    // airscrew need more rotations
+    else if(root->mEnableAirplane && &scene==root->airscrew){
+        GL_CHECK(glTranslatef(scene.mPosition.x, scene.mPosition.y, scene.mPosition.z))
+        aiVector3D& pitchAxis = root->mSceneManager->pitchAxis;
+        GL_CHECK(glRotatef(root->mSceneManager->pitch, pitchAxis.x, pitchAxis.y, pitchAxis.z))
+        aiVector3D& yawAxis = root->mSceneManager->yawAxis;
+        GL_CHECK(glRotatef(root->mSceneManager->yaw, yawAxis.x, yawAxis.y, yawAxis.z))
+        GL_CHECK(glRotatef(scene.mRotateAngle, scene.mRotate.x, scene.mRotate.y, scene.mRotate.z))
+        GL_CHECK(glScalef(scene.mScale.x, scene.mScale.y, scene.mScale.z))
+        if(scene.useShader(shaderIdx))
+            renderNode(scene.mScene->mRootNode, scene, shaders[shaderIdx]);
+    }
+    else {
+        GL_CHECK(glTranslatef(scene.mPosition.x, scene.mPosition.y, scene.mPosition.z))
+        GL_CHECK(glRotatef(scene.mRotateAngle, scene.mRotate.x, scene.mRotate.y, scene.mRotate.z))
+        GL_CHECK(glScalef(scene.mScale.x, scene.mScale.y, scene.mScale.z))
+        if(scene.useShader(shaderIdx))
+            renderNode(scene.mScene->mRootNode, scene, shaders[shaderIdx]);
+    }
     GL_CHECK(glPopMatrix())
 }
 
@@ -116,7 +142,8 @@ void RenderManager::renderNode(aiNode* node, SceneNode& scene, Shader* shader)
         GL_CHECK(setMaterial(scene.mScene, mesh, shader))
         GL_CHECK(setTextures(scene.mTexture, mesh, shader))
         GL_CHECK(setMeshData(mesh, shader))
-        GL_CHECK(glDrawElements(GL_TRIANGLES, /*3*mesh->mNumFaces*/ scene.mIndexBuffer[node->mMeshes[i]].size(), GL_UNSIGNED_INT, &(scene.mIndexBuffer[node->mMeshes[i]][0])))
+        GL_CHECK(glDrawElements(GL_TRIANGLES, /*3*mesh->mNumFaces*/ scene.mIndexBuffer[node->mMeshes[i]].size(),
+                 GL_UNSIGNED_INT, &(scene.mIndexBuffer[node->mMeshes[i]][0])))
     }
 
     for(unsigned i = 0; i < node->mNumChildren; i++){
@@ -410,8 +437,8 @@ void RenderManager::renderSkyBox()
     GL_CHECK(glEnable(GL_TEXTURE_2D))
     //GL_CHECK(glDisable(GL_DEPTH_TEST))
     GL_CHECK(glDepthMask(GL_FALSE))
-    GL_CHECK(glDisable(GL_LIGHTING))
-    GL_CHECK(glDisable(GL_BLEND))
+    //GL_CHECK(glDisable(GL_LIGHTING))
+    //GL_CHECK(glDisable(GL_BLEND))
     GL_CHECK(glColor4f(1,1,1,1))
 
     GL_CHECK(glActiveTexture(GL_TEXTURE0))
@@ -466,7 +493,7 @@ void RenderManager::renderSkyBox()
         glTexCoord2f(1, 1); glVertex3f(  0.5f,  0.5f, -0.5f );
     glEnd();
 
-    GL_CHECK(glEnable(GL_LIGHTING))
+    //GL_CHECK(glEnable(GL_LIGHTING))
     GL_CHECK(glDepthMask(GL_TRUE))
     GL_CHECK(glPopAttrib())
     GL_CHECK(glPopMatrix())

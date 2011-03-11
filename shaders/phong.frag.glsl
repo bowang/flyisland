@@ -3,6 +3,9 @@ uniform sampler2D specularTex;
 // uniform sampler2D normalTex;
 // uniform sampler2D shadowTex;
 
+uniform bool enableDiffuse;
+uniform bool enableSpecular;
+
 uniform vec3 Kd;
 uniform vec3 Ks;
 uniform vec3 Ka;
