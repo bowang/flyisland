@@ -19,6 +19,7 @@ Root::Root(string configFileName)
         viewMode = FlyView;
     else
         viewMode = FreeView;
+    mHighSpeed = false;
 }
 
 bool Root::loadConfigFile()
@@ -56,8 +57,17 @@ void Root::run()
     printf("\n[Root] Begin rendering\n");
     while (window.IsOpened()) {
         mInputManager->handleInput();
-        mSceneManager->updateWorld();
-        mRenderManager->renderFrame();
+
+        GL_CHECK(glClear(GL_ACCUM_BUFFER_BIT))
+        int run = 1;
+        if(mHighSpeed) run = 5;
+        for(int i = 0; i < run; i++){
+            mSceneManager->updateWorld();
+            mRenderManager->renderFrame();
+            GL_CHECK(glAccum(GL_ACCUM, 1.f/float(run)))
+        }
+        GL_CHECK(glAccum(GL_RETURN, 1.f))
+
         window.Display();
     }
 

@@ -112,7 +112,7 @@ void SceneManager::updateWorld()
     }
 
     // update camera
-    if(root->mEnableAirplane && cameraClock.GetElapsedTime() > 0.01f){
+    if(root->mEnableAirplane && cameraClock.GetElapsedTime() > 0.001f){
         if(root->viewMode==FollowView){
             aiVector3D d = root->target - root->airplane->mPosition;
             root->target = root->airplane->mPosition;
@@ -122,7 +122,7 @@ void SceneManager::updateWorld()
             aiVector3D v = flyDirection - root->airplane->mPosition;
             v.Normalize();
             root->target = root->airplane->mPosition;
-            root->eye = root->airplane->mPosition - v*40.0f;
+            root->eye = root->airplane->mPosition - v*35.0f;
         }
         cameraClock.Reset();
     }

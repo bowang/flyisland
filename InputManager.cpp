@@ -97,28 +97,36 @@ void InputManager::handleInput()
         if(input.IsKeyDown(sf::Key::Left)){
             aiVector3D direction = root->target - root->eye;
             aiVector3D d = cross(root->up, direction);
-            d.Normalize();
-            d *= delta;
-            root->eye += d;
+            if(d.Length()){
+                d.Normalize();
+                d *= delta;
+                root->eye += d;
+            }
         }
         if(input.IsKeyDown(sf::Key::Right)){
             aiVector3D direction = root->target - root->eye;
             aiVector3D d = cross(root->up, direction);
-            d.Normalize();
-            d *= delta;
-            root->eye -= d;
+            if(d.Length()){
+                d.Normalize();
+                d *= delta;
+                root->eye -= d;
+            }
         }
         if(input.IsKeyDown(sf::Key::Up)){
             aiVector3D d = root->target - root->eye;
-            d.Normalize();
-            d *= delta;
-            root->eye += d;
+            if(d.Length()){
+                d.Normalize();
+                d *= delta;
+                root->eye += d;
+            }
         }
         if(input.IsKeyDown(sf::Key::Down)){
             aiVector3D d = root->target - root->eye;
-            d.Normalize();
-            d *= delta;
-            root->eye -= d;
+            if(d.Length()){
+                d.Normalize();
+                d *= delta;
+                root->eye -= d;
+            }
         }
     }
     else if(root->viewMode==FlyView){
@@ -171,9 +179,9 @@ void InputManager::handleInput()
 
     if(input.IsKeyDown(sf::Key::D)){
         aiVector3D v = root->mSceneManager->flyDirection - root->airplane->mPosition;
-        v.Normalize();
+        if(v.Length() > 0.00001f) v.Normalize();
         aiVector3D h = aiVector3D(v.x, 0.0f, v.z);
-        h.Normalize();
+        if(h.Length() > 0.00001f) h.Normalize();
         float pitch = 0.0f;
         if(v.y != 0.0f)
             pitch = fabs(v.y)/v.y*acos(dot(v,h))/Pi*180.0f;
@@ -193,9 +201,9 @@ void InputManager::handleInput()
 
     if(input.IsKeyDown(sf::Key::A)){
         aiVector3D v = root->mSceneManager->flyDirection - root->airplane->mPosition;
-        v.Normalize();
+        if(v.Length() > 0.00001f) v.Normalize();
         aiVector3D h = aiVector3D(v.x, 0.0f, v.z);
-        h.Normalize();
+        if(h.Length() > 0.00001f) h.Normalize();
         float pitch = 0.0f;
         if(v.y != 0.0f)
             pitch = fabs(v.y)/v.y*acos(dot(v,h))/Pi*180.0f;
@@ -211,6 +219,14 @@ void InputManager::handleInput()
         v.x = lenxz * cos(yaw);
         v.z = lenxz * sin(yaw);
         root->mSceneManager->flyDirection = root->airplane->mPosition + v;
+    }
+
+    if(input.IsKeyDown(sf::Key::Space)){
+        root->mHighSpeed = true;
+        printf("High Speed!\n");
+    }
+    else{
+        root->mHighSpeed = false;
     }
 
     if(mouseCaptureEnabled){

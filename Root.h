@@ -32,6 +32,7 @@ public:
     int    mNumOfShaders;
     int    mNumOfLights;
     bool   mEnableAirplane;
+    bool   mHighSpeed;
 
     // Camera parameters
     aiVector3D eye;
