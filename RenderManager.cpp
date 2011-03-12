@@ -54,6 +54,19 @@ void RenderManager::renderFrame()
     // render skybox first
     renderSkyBox();
     
+    // render objects (airplane, island, etc)
+    renderObjects();
+
+    // render triangles for testing purpose
+    // renderTriangles(shaders[3]);
+    
+    // render particles here
+    
+
+}
+
+void RenderManager::renderObjects()
+{
     // render objects in the scene with different shaders
     for(int shaderIdx = 0; shaderIdx < root->mNumOfShaders; shaderIdx++){
         switch(shaderIdx){
@@ -63,7 +76,7 @@ void RenderManager::renderFrame()
             GL_CHECK(glViewport(0, 0, window.GetWidth(), window.GetHeight()))
             GL_CHECK(setCamera())
             GL_CHECK(setLight())
-            for(int i = 0; i < root->mSceneManager->mSceneNodes.size(); i++){
+            for(unsigned i = 0; i < root->mSceneManager->mSceneNodes.size(); i++){
                 renderScene(root->mSceneManager->mSceneNodes[i], shaderIdx);
             }
             break;
@@ -81,10 +94,6 @@ void RenderManager::renderFrame()
             break;
         }
     }
-    
-    // render particles here
-
-
 }
 
 void RenderManager::renderScene(SceneNode& scene, int shaderIdx)
@@ -127,6 +136,8 @@ void RenderManager::renderScene(SceneNode& scene, int shaderIdx)
 
 void RenderManager::renderNode(aiNode* node, SceneNode& scene, Shader* shader)
 {
+    // printf("node = %s\n", node->mName.data);
+
     GL_CHECK(glPushMatrix())
     aiMatrix4x4 &m = node->mTransformation;
     GLfloat modelMatrix [] = {m.a1, m.b1, m.c1, m.d1,
@@ -185,17 +196,16 @@ void RenderManager::setMaterial(const aiScene* scene, aiMesh* mesh, Shader* shad
             GL_CHECK(glUniform1f(shininess, 30))
         }
     }
-
-
 }
 
 void RenderManager::setTextures(vector<TextureSet> &textures, aiMesh* mesh, Shader* shader)
 {
     TextureSet& tex = textures[mesh->mMaterialIndex];
+    // printf("    mMaterialIndex = %d\n", mesh->mMaterialIndex);
     GLint diffuse, specular, normal, shadow, cube, inverseview;
 
     if(shader->useDiffuse){
-        GL_CHECK(diffuse = glGetUniformLocation(shader->programID(), "diffuseTex"))
+        GL_CHECK(diffuse = glGetUniformLocation(shader->programID(), "diffuseMap"))
         GL_CHECK(glUniform1i(diffuse, 0))
         GL_CHECK(glActiveTexture(GL_TEXTURE0))
         if(tex.diffuseExist){
@@ -211,7 +221,7 @@ void RenderManager::setTextures(vector<TextureSet> &textures, aiMesh* mesh, Shad
     }
 
     if(shader->useSpecular){
-        GL_CHECK(specular = glGetUniformLocation(shader->programID(), "specularTex"))
+        GL_CHECK(specular = glGetUniformLocation(shader->programID(), "specularMap"))
         GL_CHECK(glUniform1i(specular, 1))
         GL_CHECK(glActiveTexture(GL_TEXTURE1))
         if(tex.specularExist){
@@ -227,7 +237,7 @@ void RenderManager::setTextures(vector<TextureSet> &textures, aiMesh* mesh, Shad
     }
 
     if(shader->useNormal){
-        GL_CHECK(normal = glGetUniformLocation(shader->programID(), "normalTex"))
+        GL_CHECK(normal = glGetUniformLocation(shader->programID(), "normalMap"))
         GL_CHECK(glUniform1i(normal, 2))
         GL_CHECK(glActiveTexture(GL_TEXTURE2))
         if(tex.normalExist){
@@ -243,7 +253,7 @@ void RenderManager::setTextures(vector<TextureSet> &textures, aiMesh* mesh, Shad
     }
 
     if(shader->useShadow){
-        GL_CHECK(shadow = glGetUniformLocation(shader->programID(), "shadowTex"))
+        GL_CHECK(shadow = glGetUniformLocation(shader->programID(), "shadowMap"))
         GL_CHECK(glUniform1i(shadow, 7))
         GL_CHECK(glActiveTexture(GL_TEXTURE7))
         GL_CHECK(glBindTexture(GL_TEXTURE_2D, depthBuffer->textureID()))
@@ -255,7 +265,7 @@ void RenderManager::setTextures(vector<TextureSet> &textures, aiMesh* mesh, Shad
     }
 
     if(shader->useCube){
-        GL_CHECK(cube = glGetUniformLocation(shader->programID(), "cubeTex"))
+        GL_CHECK(cube = glGetUniformLocation(shader->programID(), "cubeMap"))
         GL_CHECK(glUniform1i(cube, 3))
         GL_CHECK(glActiveTexture(GL_TEXTURE3))
         GL_CHECK(glBindTexture(GL_TEXTURE_CUBE_MAP, tColorCubeMap))
@@ -277,6 +287,11 @@ void RenderManager::setMeshData(aiMesh* mesh, Shader* shader)
         GL_CHECK(position = glGetAttribLocation(shader->programID(), "positionIn"))
         GL_CHECK(glEnableVertexAttribArray(position))
         GL_CHECK(glVertexAttribPointer(position, 3, GL_FLOAT, 0, sizeof(aiVector3D), mesh->mVertices))
+/*
+    for(int i = 0; i < 10; i++)
+        printf("%f ", mesh->mVertices[i]);
+    printf("\n");
+*/
     }
 
     if(shader->useDiffuse || shader->useSpecular){
@@ -284,6 +299,11 @@ void RenderManager::setMeshData(aiMesh* mesh, Shader* shader)
         GL_CHECK(texcoord = glGetAttribLocation(shader->programID(), "texcoordIn"))
         GL_CHECK(glEnableVertexAttribArray(texcoord))
         GL_CHECK(glVertexAttribPointer(texcoord, 2, GL_FLOAT, 0, sizeof(aiVector3D), mesh->mTextureCoords[0]))
+/*
+    for(int i = 0; i < 10; i++)
+        printf("%f ", mesh->mTextureCoords[0][i]);
+    printf("\n");
+*/
     }
 
     if(shader->useNormal){
@@ -333,7 +353,7 @@ void RenderManager::setCamera() {
     // Set up the projection and model-view matrices
     GLfloat aspectRatio = (GLfloat)window.GetWidth()/window.GetHeight();
     GLfloat nearClip = 0.1f;
-    GLfloat farClip = 5000.0f;
+    GLfloat farClip = 500.0f;
     GLfloat fieldOfView = 45.0f; // Degrees
 
     glMatrixMode(GL_PROJECTION);
@@ -396,7 +416,7 @@ void RenderManager::setCameraForCube(GLuint face)
 
 void RenderManager::renderCubeFaces(SceneNode &scene)
 {
-    float cubeSize = 800.0f;
+    unsigned cubeSize = 800;
     GL_CHECK(glUseProgram(shaders[1]->programID()))
     GL_CHECK(glEnable(GL_TEXTURE_CUBE_MAP))
     GL_CHECK(glGenTexturesEXT(1, &tColorCubeMap))
@@ -497,5 +517,40 @@ void RenderManager::renderSkyBox()
     GL_CHECK(glDepthMask(GL_TRUE))
     GL_CHECK(glPopAttrib())
     GL_CHECK(glPopMatrix())
+}
+
+void RenderManager::renderTriangles(Shader* shader){
+    GLint position;
+    vector<aiVector3D>& triVertices = root->mSceneManager->triVertices;
+
+    GL_CHECK(glMatrixMode(GL_MODELVIEW))
+    GL_CHECK(glPushMatrix())
+    GL_CHECK(setCamera())
+    GL_CHECK(glLineWidth(1.0f))
+    GL_CHECK(position = glGetAttribLocation(shader->programID(), "positionIn"))
+    GL_CHECK(glEnableVertexAttribArray(position))
+    GL_CHECK(glVertexAttribPointer(position, 3, GL_FLOAT, 0, sizeof(aiVector3D), &triVertices[0]))
+    //GL_CHECK(glVertexAttribPointer(position, 3, GL_FLOAT, 0, 0, &triVertices[0]))
+
+    /*
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    for(int i = 0; i < tree->intersected.size(); i++){
+        GL_CHECK(glDrawArrays(GL_TRIANGLES, tree->intersected[i]*3, 1))
+    }
+    */
+
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    GL_CHECK(glDrawArrays(GL_TRIANGLES, 0, triVertices.size()))
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+    /*
+    // draw the forefront
+    GL_CHECK(glPointSize(7.0f))
+    GL_CHECK(glVertexAttribPointer(position, 3, GL_FLOAT, 0, sizeof(aiVector3D), &center))
+    GL_CHECK(glDrawArrays(GL_POINTS, 0, 1))
+    */
+
+    GL_CHECK(glPopMatrix())
+
 }
 

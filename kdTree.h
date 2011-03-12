@@ -22,7 +22,7 @@ public:
     kdTree(std::vector<aiVector3D>& triVertices, std::vector<aiVector3D>& triNormals);
     float detectCollision(aiVector3D& start, aiVector3D& end);
     int findIntersection(TreeNode* current, aiVector3D& start, aiVector3D& end);
-    float intersectDist(int i, aiVector3D& start, aiVector3D& end);
+    float intersectDist(int idx, aiVector3D& r0, aiVector3D& d);
 
     TreeNode* root;
     std::vector<aiVector3D>* triangles;

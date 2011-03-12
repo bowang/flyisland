@@ -2,7 +2,8 @@
 
 SceneNode::SceneNode()
 {
-
+    index = -1;
+    fixed = false;
 }
 
 bool SceneNode::ReadFile(const std::string &pFile, unsigned int pFlags)
@@ -10,6 +11,7 @@ bool SceneNode::ReadFile(const std::string &pFile, unsigned int pFlags)
     mSceneName = pFile;
     mImporter.SetPropertyInteger(AI_CONFIG_PP_SBP_REMOVE, aiPrimitiveType_LINE|aiPrimitiveType_POINT);
     mScene = mImporter.ReadFile(pFile, pFlags);
+    mImporter.ApplyPostProcessing(aiProcess_FlipUVs);
     return (NULL != mScene);
 }
 
@@ -30,25 +32,27 @@ void SceneNode::loadTextures()
 
     for(unsigned i = 0; i < mScene->mNumMaterials; i++){
         aiMaterial* material = mScene->mMaterials[i];
-
+        
+        filename.Clear();
         material->GetTexture(aiTextureType_DIFFUSE, 0, &filename);
         path.Set(prefix); path.Append(filename.data); // path.Append("_d.jpg");
         mTexture[i].diffuseExist = mTexture[i].diffuse.LoadFromFile(path.data);
         if(mTexture[i].diffuseExist)
-            printf("[SceneNode] Diffuse texture loaded: %s\n", path.data);
+            printf("[SceneNode] material[%d] : diffuse texture loaded: %s\n", i, path.data);
 
+        filename.Clear();
         material->GetTexture(aiTextureType_SPECULAR, 0, &filename);
         path.Set(prefix); path.Append(filename.data); // path.Append("_s.jpg");
         mTexture[i].specularExist = mTexture[i].specular.LoadFromFile(path.data);
         if(mTexture[i].specularExist)
-            printf("[SceneNode] Specular texture loaded: %s\n", path.data);
+            printf("[SceneNode] material[%d] : specular texture loaded: %s\n", i, path.data);
 
+        filename.Clear();
         material->GetTexture(aiTextureType_NORMALS, 0, &filename);
         path.Set(prefix); path.Append(filename.data); // path.Append("_n.jpg");
         mTexture[i].normalExist = mTexture[i].normal.LoadFromFile(path.data);
         if(mTexture[i].normalExist)
-            printf("[SceneNode] Normal texture loaded: %s\n", path.data);
-
+            printf("[SceneNode] material[%d] : normal texture loaded: %s\n", i, path.data);
     }
 
     delete[] prefix;
@@ -81,10 +85,14 @@ void SceneNode::loadParameters(const char* sceneName, const char* configFileName
         printf("%d ", num);
     }
     printf("\n");
+
+    fixed = GetPrivateProfileBool(sceneName, "fixed", false, configFileName);
 }
 
 void SceneNode::buildIndexBuffer()
 {
+    // FILE* fout = fopen("out.txt", "wt");
+
     mIndexBuffer.reserve(mScene->mNumMeshes);
     for(unsigned i = 0; i < mScene->mNumMeshes; i++){
         aiMesh* mesh = mScene->mMeshes[i];
@@ -94,6 +102,7 @@ void SceneNode::buildIndexBuffer()
             aiFace& face = mesh->mFaces[j];
             for(unsigned k = 0; k < face.mNumIndices; k++){
                 iBuffer.push_back(face.mIndices[k]);
+                // fprintf(fout, "%d ", face.mIndices[k]);
             }
         }
         mIndexBuffer.push_back(iBuffer);
@@ -121,7 +130,7 @@ int SceneNode::numShaders()
 
 bool SceneNode::useShader(int i)
 {
-    for(int j = 0; j < mShaderList.size(); j++){
+    for(unsigned j = 0; j < mShaderList.size(); j++){
         if(i==mShaderList[j]) return true;
     }
     return false;

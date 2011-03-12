@@ -223,7 +223,6 @@ void InputManager::handleInput()
 
     if(input.IsKeyDown(sf::Key::Space)){
         root->mHighSpeed = true;
-        printf("High Speed!\n");
     }
     else{
         root->mHighSpeed = false;

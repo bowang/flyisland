@@ -1,4 +1,4 @@
-uniform samplerCube cubeTex;
+uniform samplerCube cubeMap;
 uniform mat4 inverseView;
 
 varying vec3 normal;
@@ -12,7 +12,7 @@ void main() {
     vec3 R = reflect(V, N);
     vec4 cubecoord = inverseView * vec4(R,0);
 
-    vec4 color = textureCube(cubeTex, cubecoord.xyz);
+    vec4 color = textureCube(cubeMap, cubecoord.xyz);
     gl_FragColor = color * vec4(gold, 1.0);
     // gl_FragColor = vec4(cubecoord.xyz, 1);
 }

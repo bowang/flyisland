@@ -23,6 +23,7 @@ private:
     GLfloat inverseView[16];
 
     void loadShaders();
+    void renderObjects();
     void renderScene(SceneNode& scene, int shaderIdx);
     void renderNode(aiNode* node, SceneNode& scene, Shader* shader);
     void setMaterial(const aiScene* scene, aiMesh* mesh, Shader* shader);
@@ -34,6 +35,7 @@ private:
     void renderCubeFaces(SceneNode &scene);
     void setCameraForCube(GLuint face);
     void renderSkyBox();
+    void renderTriangles(Shader* shader);
 
     GLuint tColorCubeMap;
 

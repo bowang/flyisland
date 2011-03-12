@@ -133,7 +133,7 @@ float kdTree::detectCollision(aiVector3D& start, aiVector3D& end){
     if(idx < 0)
         return 100.0f;
     else{
-        aiVector3D d = (end-start).Normalize();
+        aiVector3D d = end-start;
         return intersectDist(idx, start, d);
     }
 }
@@ -147,7 +147,7 @@ int kdTree::_findIntersection(TreeNode* current, aiVector3D& start, aiVector3D& 
 
     // if both left and right child are null, search the BBList
     if(current->left==NULL && current->right==NULL){
-        aiVector3D d = (end-start).Normalize();
+        aiVector3D d = end-start;
         int min_idx = -1;
         float min_dist = FLT_MAX;
         for(unsigned i = 0; i < current->BBList.size(); i++){
@@ -180,8 +180,8 @@ int kdTree::_findIntersection(TreeNode* current, aiVector3D& start, aiVector3D& 
     if(right_candidate==-1) return left_candidate;
 
     // when both left and right candidates are not -1
-    float left_dist  = intersectDist(left_candidate,  start, end);
-    float right_dist = intersectDist(right_candidate, start, end);
+    float left_dist  = intersectDist(left_candidate,  start, end-start);
+    float right_dist = intersectDist(right_candidate, start, end-start);
     if(left_dist < right_dist)
         return left_candidate;
     else
@@ -235,6 +235,8 @@ int kdTree::longestDim(TreeNode* node){
 float kdTree::intersectDist(int idx, aiVector3D& r0, aiVector3D& d){
 
     if(idx < 0) return FLT_MAX;
+
+    d.Normalize();
 
     aiVector3D p1 = (*triangles)[idx*3];
     aiVector3D p2 = (*triangles)[idx*3+1];

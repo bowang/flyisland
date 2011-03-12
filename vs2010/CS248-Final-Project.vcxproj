@@ -37,6 +37,8 @@
     <ClInclude Include="..\Utility.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\shaders\box.frag.glsl" />
+    <None Include="..\shaders\box.vert.glsl" />
     <None Include="..\shaders\cube.frag.glsl" />
     <None Include="..\shaders\cube.vert.glsl" />
     <None Include="..\shaders\env.frag.glsl" />

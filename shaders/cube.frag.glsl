@@ -1,6 +1,6 @@
-uniform sampler2D diffuseTex;
-uniform sampler2D specularTex;
-uniform sampler2D normalTex;
+uniform sampler2D diffuseMap;
+uniform sampler2D specularMap;
+uniform sampler2D normalMap;
 
 uniform vec3 Kd;
 uniform vec3 Ks;
@@ -15,7 +15,7 @@ varying vec3 eyePosition;
 
 void main() {
 
-    vec4 norm = vec4(texture2D(normalTex, texcoord).rgb, 1);
+    vec4 norm = vec4(texture2D(normalMap, texcoord).rgb, 1);
     mat4 expand = mat4(2,0,0,0, 0,2,0,0, 0,0,2,0, -1,-1,-1,1);
     norm = expand * norm;
     vec3 t = normalize(tangent);
@@ -30,7 +30,7 @@ void main() {
     
     float Rd0 = max(0.0, dot(L0, N));
     float Rd1 = max(0.0, dot(L1, N));
-    vec3 Td = texture2D(diffuseTex, texcoord).rgb;
+    vec3 Td = texture2D(diffuseMap, texcoord).rgb;
     vec3 diffuse =  Rd0 * Kd * Td * gl_LightSource[0].diffuse.rgb
                   + Rd1 * Kd * Td * gl_LightSource[1].diffuse.rgb;
 
@@ -38,7 +38,7 @@ void main() {
     vec3 R1 = reflect(-L1, N);
     float Rs0 = pow(max(0.0, dot(V, R0)), alpha);
     float Rs1 = pow(max(0.0, dot(V, R1)), alpha);
-    vec3 Ts = texture2D(specularTex, texcoord).rgb;
+    vec3 Ts = texture2D(specularMap, texcoord).rgb;
     vec3 specular =  Rs0 * Ks * Ts * gl_LightSource[0].specular.rgb
                    + Rs1 * Ks * Ts * gl_LightSource[1].specular.rgb;
 

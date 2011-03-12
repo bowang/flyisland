@@ -36,6 +36,20 @@ void SceneManager::loadAssets()
         mSceneNodes[i].initialize(i, root->mConfigFileName.c_str());
     }
 
+    // build kdTree
+    
+    int j;
+    if(root->mEnableAirplane) j = 2;
+    else j = 0;
+    for( ; j < root->mNumOfScene; j++){
+        if(mSceneNodes[j].fixed){
+            genTriangleVertices(mSceneNodes[j]);
+            printf("[SceneManager] generate triangles for scene[%d]\n", j);
+        }
+    }
+    kdtree = new kdTree(triVertices, triNormals);
+    printf("[SceneManager] kdTree is built.\n");
+
     // load images for skybox
     for(int i = 0; i < 5; i++){
         char fileName[BUFFER_SIZE];
@@ -101,12 +115,14 @@ void SceneManager::initializeWorld()
     }
 
     airplaneClock.Reset();
+    cameraClock.Reset();
+    collisionClock.Reset();
 }
 
 void SceneManager::updateWorld()
 {
     // update airplane
-    if(root->mEnableAirplane && airplaneClock.GetElapsedTime() > 0.01f){
+    if(root->mEnableAirplane && airplaneClock.GetElapsedTime() > 0.001f){
         updateAirplane();
         airplaneClock.Reset();
     }
@@ -122,10 +138,11 @@ void SceneManager::updateWorld()
             aiVector3D v = flyDirection - root->airplane->mPosition;
             v.Normalize();
             root->target = root->airplane->mPosition;
-            root->eye = root->airplane->mPosition - v*35.0f;
+            root->eye = root->airplane->mPosition - v*10.0f;
         }
         cameraClock.Reset();
     }
+
 }
 
 void SceneManager::updateAirplane()
@@ -145,15 +162,85 @@ void SceneManager::updateAirplane()
     if(v.z != 0.0f)
         yaw = -fabs(v.z)/v.z*acos(dot(h,aiVector3D(1.f,0.f,0.f)))/Pi*180.0f;
 
-    v *= flySpeed;
-    root->airplane->mPosition += v;
-    root->airscrew->mPosition += v;
-    flyDirection += v;
+    float speed = flySpeed;
+    if(root->mHighSpeed) speed *= 7;
+    v *= speed;
 
-    // rotate airscrew
-    root->airscrew->rotateIncrease(rotationSpeed);
+    // collision detection
+    if(root->mEnableAirplane && collisionClock.GetElapsedTime() > 0.001f){    
 
-    // rotate airplane
-    // root->airplane->setRotateAxis(v);
-    // root->airplane->rotate(-yaw);
+        aiVector3D position = root->airplane->mPosition;
+        aiVector3D newPosition = position + 2.f*v;
+        int triIdx = kdtree->findIntersection(kdtree->root, position, newPosition);
+        if(triIdx >= 0){
+            float dist = kdtree->intersectDist(triIdx, position, v);
+            PRINTF("[SceneManager] collision detection: triIdx=%d dist=%f\n", triIdx, dist);
+            if(dist < max(2.f*v.Length(), 1.f)){
+                root->mAirplaneCrash = true;
+                printf("[Info] Airplane crashed!\n");
+            }
+        }
+        collisionClock.Reset();
+    }
+
+    if(!root->mAirplaneCrash){
+        root->airplane->mPosition += v;
+        root->airscrew->mPosition += v;
+        flyDirection += v;
+
+        // rotate airscrew
+        root->airscrew->rotateIncrease(rotationSpeed);
+
+        // rotate airplane
+        // root->airplane->setRotateAxis(v);
+        // root->airplane->rotate(-yaw);
+    }
+
 }
+
+void SceneManager::genTriangleVertices(SceneNode& scene){
+
+    aiMatrix4x4 translate, rotate, scale;
+    translate.Translation(scene.mPosition, translate);
+    //rotate.Rotation(scene.mRotateAngle/180.f*Pi, scene.mRotate, rotate);
+    rotate.Rotation(scene.mRotateAngle/180.f*Pi, aiVector3D(0.0f,0.0f,1.0f), rotate);
+    scale.Scaling(scene.mScale,scale);
+    loadIdentity(modelMatrix);
+    modelMatrix *= translate;
+    modelMatrix *= rotate;
+    modelMatrix *= scale;
+    genTriangle(scene.mScene, scene.mScene->mRootNode);
+}
+
+void SceneManager::genTriangle(const aiScene* scene, aiNode* node){
+
+    modelMatrixStack.push(modelMatrix);
+    modelMatrix = node->mTransformation * modelMatrix;
+    aiMatrix4x4 m = modelMatrix;
+    m.Inverse().Transpose();
+
+    for(unsigned i = 0; i < node->mNumMeshes; i++){
+        aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+        for(unsigned j = 0; j < mesh->mNumFaces; j++){
+            aiFace& face = mesh->mFaces[j];
+            aiVector3D p1 = modelMatrix * mesh->mVertices[face.mIndices[0]];
+            aiVector3D p2 = modelMatrix * mesh->mVertices[face.mIndices[1]];
+            aiVector3D p3 = modelMatrix * mesh->mVertices[face.mIndices[2]];
+            triVertices.push_back(p1);
+            triVertices.push_back(p2);
+            triVertices.push_back(p3);
+            aiVector3D n  = cross((p2-p1),(p3-p2));
+            n.Normalize();
+            triNormals.push_back(n);
+        }
+    }
+
+    for(unsigned i = 0; i < node->mNumChildren; i++){
+        genTriangle(scene, node->mChildren[i]);
+    }
+
+    modelMatrix = modelMatrixStack.top();
+    modelMatrixStack.pop();
+}
+
+

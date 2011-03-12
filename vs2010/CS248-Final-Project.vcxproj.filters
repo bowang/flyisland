@@ -109,5 +109,11 @@
     <None Include="..\shaders\env.vert.glsl">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="..\shaders\box.frag.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\shaders\box.vert.glsl">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

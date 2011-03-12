@@ -72,7 +72,7 @@ float GetPrivateProfileFloat(const char* section, const char* key, float def_val
 {   
      char buffer[64];   
      if(GetPrivateProfileString(section,key,"",buffer,sizeof(buffer),filename))
-         return atof(buffer); 
+         return (float)atof(buffer); 
      return def_value; 
 } 
 

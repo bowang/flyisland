@@ -20,6 +20,7 @@ Root::Root(string configFileName)
     else
         viewMode = FreeView;
     mHighSpeed = false;
+    mAirplaneCrash = false;
 }
 
 bool Root::loadConfigFile()
@@ -60,7 +61,8 @@ void Root::run()
 
         GL_CHECK(glClear(GL_ACCUM_BUFFER_BIT))
         int run = 1;
-        if(mHighSpeed) run = 5;
+        if(mHighSpeed)
+            run = 10;
         for(int i = 0; i < run; i++){
             mSceneManager->updateWorld();
             mRenderManager->renderFrame();

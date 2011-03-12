@@ -1,6 +1,8 @@
 #ifndef FRAMEWORK_H
 #define FRAMEWORK_H
 
+#define _CRT_SECURE_NO_WARNINGS
+
 // GLEW must be included first, if we need it.
 #ifdef _WIN32
 #define GLEW_STATIC

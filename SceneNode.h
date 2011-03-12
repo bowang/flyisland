@@ -7,6 +7,7 @@
 struct TextureSet {
     sf::Image diffuse, specular, normal;
     bool diffuseExist, specularExist, normalExist;
+    TextureSet():diffuseExist(false), specularExist(false), normalExist(false){}
 };
 
 class SceneNode
@@ -23,6 +24,7 @@ public:
     vector<TextureSet> mTexture;
     vector< vector<unsigned> >   mIndexBuffer;
     int index;
+    bool fixed;
 
     bool ReadFile(const std::string &pFile, unsigned int pFlags);
     void initialize(int i, const char* configFileName);

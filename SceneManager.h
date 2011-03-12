@@ -4,6 +4,8 @@
 #include "Framework.h"
 #include "SceneNode.h"
 #include "BoundingBox.h"
+#include "kdTree.h"
+#include <stack>
 
 class Root;
 
@@ -15,8 +17,12 @@ public:
     void initializeWorld();
     void updateWorld();
     vector<SceneNode> mSceneNodes;
-    vector<BoundingBox> mBoundingBox;
     sf::Image mSkybox[5];
+
+    vector<BoundingBox> mBoundingBox;
+    std::vector<aiVector3D> triVertices;
+    std::vector<aiVector3D> triNormals;
+    kdTree* kdtree;
 
     float rotationSpeed;
     float flySpeed;
@@ -30,7 +36,13 @@ private:
     Root* root;
     sf::Clock airplaneClock;
     sf::Clock cameraClock;
+    sf::Clock collisionClock;
+    std::stack<aiMatrix4x4> modelMatrixStack;
+    aiMatrix4x4 modelMatrix;
+
     void updateAirplane();
+    void genTriangleVertices(SceneNode& scene);
+    void genTriangle(const aiScene* scene, aiNode* node);
 
 protected:
 
