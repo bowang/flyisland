@@ -66,6 +66,26 @@ void SceneManager::loadAssets()
         else printf("[SceneManager] Loading sky(top): %s\n", skyPath);
     }
 
+    // load particles
+    mParticleTypes.resize(root->mNumOfParticles);
+    for(int i = 0; i < root->mNumOfParticles; i++){
+        char fileName[BUFFER_SIZE];
+        char particleName[BUFFER_SIZE];
+        char particlePath[2*BUFFER_SIZE];
+        sprintf(particleName, "Particle %d", i);
+        GetPrivateProfileString(particleName, "FileName", "", fileName, BUFFER_SIZE, root->mConfigFileName.c_str());
+        strcpy(particlePath, root->mRootPath.c_str());    strcat(particlePath, fileName);
+        bool success = mParticleTypes[i].LoadFromFile(particlePath);
+        if(success){
+            printf("[SceneManager] Particle[%d] loaded: %s\n", i, particlePath);
+        }
+        else{
+            printf("Failed to load particle[%d]\n", i);
+        }
+        mParticleTypes[i].speed = GetPrivateProfileFloat(particleName, "speed", 2.0f, root->mConfigFileName.c_str());
+        mParticleTypes[i].size  = GetPrivateProfileFloat(particleName, "size", 1.0f, root->mConfigFileName.c_str());
+
+    }
 }
 
 void SceneManager::initializeWorld()
@@ -144,6 +164,8 @@ void SceneManager::updateWorld()
         cameraClock.Reset();
     }
 
+    // update particle
+    updateParticles();
 }
 
 void SceneManager::updateAirplane()
@@ -199,6 +221,23 @@ void SceneManager::updateAirplane()
 
 }
 
+void SceneManager::updateParticles(){
+
+    // update cannon particles
+    if(cannonClock.GetElapsedTime() > 0.01f){
+        for(unsigned i = 0; i < mCannonParticles.size(); i++){
+            if(!mCannonParticles[i].update(mBoundingBox)){
+                mCannonParticles.erase(mCannonParticles.begin()+i);
+                i--;
+            }
+        }
+        cannonClock.Reset();
+    }
+
+    // update smoke particles
+
+}
+
 void SceneManager::genTriangleVertices(SceneNode& scene){
 
     aiMatrix4x4 translate, rotate, scale;
@@ -244,4 +283,11 @@ void SceneManager::genTriangle(const aiScene* scene, aiNode* node){
     modelMatrixStack.pop();
 }
 
-
+void SceneManager::genCannonParticle()
+{
+    aiVector3D v = flyDirection - root->airplane->mPosition;
+    v.Normalize();
+    v *= mParticleTypes[0].speed;
+    CannonParticle ball(root->airplane->mPosition, v);
+    mCannonParticles.push_back(ball);
+}

@@ -39,6 +39,9 @@ bool Root::loadConfigFile()
     mNumOfLights = GetPrivateProfileInt("General", "NumOfLights", 0, mConfigFileName.c_str());
     printf("[Root] NumOfLights = %d\n", mNumOfLights);
 
+    mNumOfParticles = GetPrivateProfileInt("General", "NumOfParticles", 0, mConfigFileName.c_str());
+    printf("[Root] NumOfParticles = %d\n", mNumOfParticles);
+
     mEnableAirplane = (bool)GetPrivateProfileInt("General", "EnableAirplane", 0, mConfigFileName.c_str());
     printf("[Root] EnableAirplane = %d\n", (int)mEnableAirplane);
 

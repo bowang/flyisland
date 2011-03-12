@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\CannonParticle.cpp" />
     <ClCompile Include="..\DepthRenderTarget.cpp" />
     <ClCompile Include="..\InputManager.cpp" />
     <ClCompile Include="..\kdTree.cpp" />
@@ -24,11 +25,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\BoundingBox.h" />
+    <ClInclude Include="..\CannonParticle.h" />
     <ClInclude Include="..\Define.h" />
     <ClInclude Include="..\DepthRenderTarget.h" />
     <ClInclude Include="..\Framework.h" />
     <ClInclude Include="..\InputManager.h" />
     <ClInclude Include="..\kdTree.h" />
+    <ClInclude Include="..\Particle.h" />
     <ClInclude Include="..\RenderManager.h" />
     <ClInclude Include="..\Root.h" />
     <ClInclude Include="..\SceneManager.h" />
@@ -43,6 +46,8 @@
     <None Include="..\shaders\cube.vert.glsl" />
     <None Include="..\shaders\env.frag.glsl" />
     <None Include="..\shaders\env.vert.glsl" />
+    <None Include="..\shaders\particle.frag.glsl" />
+    <None Include="..\shaders\particle.vert.glsl" />
     <None Include="..\shaders\phong.frag.glsl" />
     <None Include="..\shaders\phong.vert.glsl" />
   </ItemGroup>

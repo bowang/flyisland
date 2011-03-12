@@ -37,6 +37,17 @@ void InputManager::handleInput()
                 else
                     printf("CameraMode: FreeView\n");
                 break;
+            case sf::Key::Dash:
+                root->mSceneManager->flySpeed -= 0.004f;
+                printf("Flying speed = %d\n", (int)(root->mSceneManager->flySpeed*1000.f));
+                break;
+            case sf::Key::Equal:
+                root->mSceneManager->flySpeed += 0.004f;
+                printf("Flying speed = %d\n", (int)(root->mSceneManager->flySpeed*1000.f));
+                break;
+            case sf::Key::Space:
+                root->mSceneManager->genCannonParticle();
+                break;
             default:
                 break;
             }
@@ -221,7 +232,7 @@ void InputManager::handleInput()
         root->mSceneManager->flyDirection = root->airplane->mPosition + v;
     }
 
-    if(input.IsKeyDown(sf::Key::Space)){
+    if(input.IsKeyDown(sf::Key::LShift)){
         root->mHighSpeed = true;
     }
     else{

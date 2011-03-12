@@ -3,8 +3,9 @@
 
 #include "Framework.h"
 #include "SceneNode.h"
-#include "BoundingBox.h"
 #include "kdTree.h"
+#include "Particle.h"
+#include "CannonParticle.h"
 #include <stack>
 
 class Root;
@@ -16,7 +17,11 @@ public:
     void loadAssets();
     void initializeWorld();
     void updateWorld();
+    void genCannonParticle();
+
     vector<SceneNode> mSceneNodes;
+    vector<Particle>  mParticleTypes;
+    vector<CannonParticle> mCannonParticles;
     sf::Image mSkybox[5];
 
     vector<BoundingBox> mBoundingBox;
@@ -24,6 +29,7 @@ public:
     std::vector<aiVector3D> triNormals;
     kdTree* kdtree;
 
+    float flySpeed;
     aiVector3D flyDirection;
     aiVector3D pitchAxis;
     aiVector3D yawAxis;
@@ -34,15 +40,16 @@ public:
 
 private:
     float rotationSpeed;
-    float flySpeed;
     Root* root;
     sf::Clock airplaneClock;
     sf::Clock cameraClock;
     sf::Clock collisionClock;
+    sf::Clock cannonClock;
     std::stack<aiMatrix4x4> modelMatrixStack;
     aiMatrix4x4 modelMatrix;
 
     void updateAirplane();
+    void updateParticles();
     void genTriangleVertices(SceneNode& scene);
     void genTriangle(const aiScene* scene, aiNode* node);
 

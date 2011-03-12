@@ -31,6 +31,7 @@ public:
     int    mNumOfScene;
     int    mNumOfShaders;
     int    mNumOfLights;
+    int    mNumOfParticles;
     bool   mEnableAirplane;
     bool   mHighSpeed;
     bool   mAirplaneCrash;

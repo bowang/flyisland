@@ -61,7 +61,7 @@ void RenderManager::renderFrame()
     // renderTriangles(shaders[3]);
     
     // render particles here
-    
+    renderParticles(shaders[4]);
 
 }
 
@@ -577,4 +577,47 @@ void RenderManager::renderTriangles(Shader* shader){
     GL_CHECK(glPopMatrix())
 
 }
+
+void RenderManager::renderParticles(Shader* shader){
+
+    GL_CHECK(glEnable(GL_POINT_SPRITE))
+    GL_CHECK(glEnable(GL_VERTEX_PROGRAM_POINT_SIZE))
+    GL_CHECK(glEnable(GL_BLEND))
+    GL_CHECK(glDepthMask(GL_FALSE))
+    GL_CHECK(glUseProgram(shader->programID()))
+
+    GLuint position, map, alpha, baseSize;
+    GL_CHECK(map = glGetUniformLocation(shader->programID(), "particleMap"))
+    GL_CHECK(glUniform1i(map, 4))
+    GL_CHECK(position = glGetAttribLocation(shader->programID(), "positionIn"))
+    GL_CHECK(alpha = glGetAttribLocation(shader->programID(), "alphaIn"))
+    GL_CHECK(baseSize = glGetUniformLocation(shader->programID(), "baseSize"))
+
+    /*************** Render Canon ****************/
+    GL_CHECK(glBlendFunc(GL_SRC_ALPHA, GL_ONE))
+    GL_CHECK(glActiveTexture(GL_TEXTURE4))
+    root->mSceneManager->mParticleTypes[0].Bind();
+    GL_CHECK(glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE))
+    GL_CHECK(glEnableVertexAttribArray(position))
+    GL_CHECK(glVertexAttribPointer(position, 3, GL_FLOAT, 0, sizeof(CannonParticle), &(root->mSceneManager->mCannonParticles[0].position)))
+    GL_CHECK(glEnableVertexAttribArray(alpha))
+    GL_CHECK(glVertexAttribPointer(alpha, 3, GL_FLOAT, 0, sizeof(CannonParticle), &(root->mSceneManager->mCannonParticles[0].alpha)))
+    GL_CHECK(glUniform1f(baseSize,  root->mSceneManager->mParticleTypes[0].size))
+    unsigned numParticles = root->mSceneManager->mCannonParticles.size();
+    if(numParticles > 0)
+        GL_CHECK(glDrawArrays(GL_POINTS, 0, numParticles))
+
+    /*************** Render Smoke ****************/
+
+
+
+
+    GL_CHECK(glDisable(GL_POINT_SPRITE))
+    GL_CHECK(glDisable(GL_VERTEX_PROGRAM_POINT_SIZE))
+    GL_CHECK(glDisable(GL_BLEND))
+    GL_CHECK(glDepthMask(GL_TRUE))
+    GL_CHECK(glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_FALSE))
+
+}
+
 
