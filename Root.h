@@ -46,7 +46,6 @@ public:
 
     // Airplane parameters
     SceneNode* airplane;
-    SceneNode* airscrew;
 
     SceneManager*  mSceneManager;
     RenderManager* mRenderManager;

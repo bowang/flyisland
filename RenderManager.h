@@ -26,6 +26,7 @@ private:
     void renderObjects();
     void renderScene(SceneNode& scene, int shaderIdx);
     void renderNode(aiNode* node, SceneNode& scene, Shader* shader);
+    void renderAirplane(aiNode* node, SceneNode& scene, Shader* shader);
     void setMaterial(const aiScene* scene, aiMesh* mesh, Shader* shader);
     void setTextures(vector<TextureSet> &textures, aiMesh* mesh, Shader* shader);
     void setMeshData(aiMesh* mesh, Shader* shader);

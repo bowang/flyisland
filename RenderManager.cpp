@@ -109,20 +109,8 @@ void RenderManager::renderScene(SceneNode& scene, int shaderIdx)
         GL_CHECK(glRotatef(scene.mRotateAngle, scene.mRotate.x, scene.mRotate.y, scene.mRotate.z))
         GL_CHECK(glScalef(scene.mScale.x, scene.mScale.y, scene.mScale.z))
         if(scene.useShader(shaderIdx))
-            renderNode(scene.mScene->mRootNode, scene, shaders[shaderIdx]);
+            renderAirplane(scene.mScene->mRootNode, scene, shaders[shaderIdx]);
 
-    }
-    // airscrew need more rotations
-    else if(root->mEnableAirplane && &scene==root->airscrew){
-        GL_CHECK(glTranslatef(scene.mPosition.x, scene.mPosition.y, scene.mPosition.z))
-        aiVector3D& pitchAxis = root->mSceneManager->pitchAxis;
-        GL_CHECK(glRotatef(root->mSceneManager->pitch, pitchAxis.x, pitchAxis.y, pitchAxis.z))
-        aiVector3D& yawAxis = root->mSceneManager->yawAxis;
-        GL_CHECK(glRotatef(root->mSceneManager->yaw, yawAxis.x, yawAxis.y, yawAxis.z))
-        GL_CHECK(glRotatef(scene.mRotateAngle, scene.mRotate.x, scene.mRotate.y, scene.mRotate.z))
-        GL_CHECK(glScalef(scene.mScale.x, scene.mScale.y, scene.mScale.z))
-        if(scene.useShader(shaderIdx))
-            renderNode(scene.mScene->mRootNode, scene, shaders[shaderIdx]);
     }
     else {
         GL_CHECK(glTranslatef(scene.mPosition.x, scene.mPosition.y, scene.mPosition.z))
@@ -134,10 +122,56 @@ void RenderManager::renderScene(SceneNode& scene, int shaderIdx)
     GL_CHECK(glPopMatrix())
 }
 
+void RenderManager::renderAirplane(aiNode* node, SceneNode& scene, Shader* shader)
+{
+    const char * airscrew = "nhprpsil";
+    const char * airscrew_edge = "nhprpwht";
+    const char * airtail = "nhbpblk";
+    const char * airtail_edge = "nhbpwht";
+
+    GL_CHECK(glPushMatrix())
+    aiMatrix4x4 &m = node->mTransformation;
+    GLfloat modelMatrix [] = {m.a1, m.b1, m.c1, m.d1,
+                              m.a2, m.b2, m.c2, m.d2,
+                              m.a3, m.b3, m.c3, m.d3,
+                              m.a4, m.b4, m.c4, m.d4};
+    GL_CHECK(glMatrixMode(GL_MODELVIEW))
+    GL_CHECK(glMultMatrixf(modelMatrix))
+
+    if ((strcmp(node->mName.data,airscrew)==0)||(strcmp(node->mName.data,airscrew_edge)==0)) {
+        float angle = root->mSceneManager->airscrewTopAngle;
+        float sintmp = sin(angle);
+        float costmp = cos(angle);
+        float airscrewRotate[16] = {costmp, sintmp, 0, 0, -sintmp, costmp, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}; // Z-rotation
+        glMultMatrixf(airscrewRotate);
+    }
+    
+    if ((strcmp(node->mName.data,airtail) == 0)||(strcmp(node->mName.data,airtail_edge) == 0)) {
+        float angle = root->mSceneManager->airscrewTailAngle;
+        float sintmp = sin(angle);
+        float costmp = cos(angle);
+        float airscrewRotate[16] = {1, 0, 0, 0, 0, costmp, sintmp, 0, 0, -sintmp, costmp, 0, 0, 0, 0, 1}; // X-rotation
+        glMultMatrixf(airscrewRotate);
+    }
+
+    for(unsigned i = 0; i < node->mNumMeshes; i++){
+        aiMesh* mesh = scene.mScene->mMeshes[node->mMeshes[i]];
+        GL_CHECK(setMaterial(scene.mScene, mesh, shader))
+        GL_CHECK(setTextures(scene.mTexture, mesh, shader))
+        GL_CHECK(setMeshData(mesh, shader))
+        GL_CHECK(glDrawElements(GL_TRIANGLES, scene.mIndexBuffer[node->mMeshes[i]].size(),
+                 GL_UNSIGNED_INT, &(scene.mIndexBuffer[node->mMeshes[i]][0])))
+    }
+
+    for(unsigned i = 0; i < node->mNumChildren; i++){
+        renderAirplane(node->mChildren[i], scene, shader);
+    }
+
+    GL_CHECK(glPopMatrix())
+}
+
 void RenderManager::renderNode(aiNode* node, SceneNode& scene, Shader* shader)
 {
-    // printf("node = %s\n", node->mName.data);
-
     GL_CHECK(glPushMatrix())
     aiMatrix4x4 &m = node->mTransformation;
     GLfloat modelMatrix [] = {m.a1, m.b1, m.c1, m.d1,
@@ -287,11 +321,6 @@ void RenderManager::setMeshData(aiMesh* mesh, Shader* shader)
         GL_CHECK(position = glGetAttribLocation(shader->programID(), "positionIn"))
         GL_CHECK(glEnableVertexAttribArray(position))
         GL_CHECK(glVertexAttribPointer(position, 3, GL_FLOAT, 0, sizeof(aiVector3D), mesh->mVertices))
-/*
-    for(int i = 0; i < 10; i++)
-        printf("%f ", mesh->mVertices[i]);
-    printf("\n");
-*/
     }
 
     if(shader->useDiffuse || shader->useSpecular){
@@ -299,11 +328,6 @@ void RenderManager::setMeshData(aiMesh* mesh, Shader* shader)
         GL_CHECK(texcoord = glGetAttribLocation(shader->programID(), "texcoordIn"))
         GL_CHECK(glEnableVertexAttribArray(texcoord))
         GL_CHECK(glVertexAttribPointer(texcoord, 2, GL_FLOAT, 0, sizeof(aiVector3D), mesh->mTextureCoords[0]))
-/*
-    for(int i = 0; i < 10; i++)
-        printf("%f ", mesh->mTextureCoords[0][i]);
-    printf("\n");
-*/
     }
 
     if(shader->useNormal){

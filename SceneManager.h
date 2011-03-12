@@ -24,15 +24,17 @@ public:
     std::vector<aiVector3D> triNormals;
     kdTree* kdtree;
 
-    float rotationSpeed;
-    float flySpeed;
     aiVector3D flyDirection;
     aiVector3D pitchAxis;
     aiVector3D yawAxis;
     float pitch;
     float yaw;
+    float airscrewTopAngle;
+    float airscrewTailAngle;
 
 private:
+    float rotationSpeed;
+    float flySpeed;
     Root* root;
     sf::Clock airplaneClock;
     sf::Clock cameraClock;

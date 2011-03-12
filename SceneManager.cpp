@@ -5,6 +5,8 @@ SceneManager::SceneManager(Root* root)
 {
     this->root = root;
     mSceneNodes.resize(root->mNumOfScene);
+    airscrewTopAngle = 0.0f;
+    airscrewTailAngle = 0.0f;
 }
 
 char skyName[5][6] = {"Front", "Left", "Back", "Right", "Top"};
@@ -80,7 +82,6 @@ void SceneManager::initializeWorld()
 
     if(root->mEnableAirplane){
         root->airplane = &(mSceneNodes[0]);
-        root->airscrew = &(mSceneNodes[1]);
         flyDirection.x = GetPrivateProfileFloat("Initialization", "flyDirectionX", 1.0f, root->mConfigFileName.c_str());
         flyDirection.y = GetPrivateProfileFloat("Initialization", "flyDirectionY", 0.0f, root->mConfigFileName.c_str());
         flyDirection.z = GetPrivateProfileFloat("Initialization", "flyDirectionZ", 0.0f, root->mConfigFileName.c_str());
@@ -138,7 +139,7 @@ void SceneManager::updateWorld()
             aiVector3D v = flyDirection - root->airplane->mPosition;
             v.Normalize();
             root->target = root->airplane->mPosition;
-            root->eye = root->airplane->mPosition - v*10.0f;
+            root->eye = root->airplane->mPosition - v*10.f;
         }
         cameraClock.Reset();
     }
@@ -185,11 +186,11 @@ void SceneManager::updateAirplane()
 
     if(!root->mAirplaneCrash){
         root->airplane->mPosition += v;
-        root->airscrew->mPosition += v;
         flyDirection += v;
 
         // rotate airscrew
-        root->airscrew->rotateIncrease(rotationSpeed);
+        airscrewTopAngle += rotationSpeed/180.f*Pi;
+        airscrewTailAngle += rotationSpeed/180.f*Pi;
 
         // rotate airplane
         // root->airplane->setRotateAxis(v);

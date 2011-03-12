@@ -16,7 +16,7 @@ Root::Root(string configFileName)
     mRenderManager = new RenderManager(this);
     mInputManager = new InputManager(this);
     if(mEnableAirplane)
-        viewMode = FlyView;
+        viewMode = FollowView;
     else
         viewMode = FreeView;
     mHighSpeed = false;
