@@ -47,8 +47,10 @@ void RenderManager::preprocess()
     // renderCubeFaces(root->mSceneManager->mSceneNodes[0]);
 }
 
-void RenderManager::renderFrame() 
+void RenderManager::renderFrame(int j) 
 {
+    renderPosition = j;
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // render skybox first
@@ -74,7 +76,7 @@ void RenderManager::renderObjects()
         case 0:
             GL_CHECK(glUseProgram(shaders[shaderIdx]->programID()))
             GL_CHECK(glViewport(0, 0, window.GetWidth(), window.GetHeight()))
-            GL_CHECK(setCamera())
+            GL_CHECK(setCameraDOF())
             GL_CHECK(setLight())
             for(unsigned i = 0; i < root->mSceneManager->mSceneNodes.size(); i++){
                 renderScene(root->mSceneManager->mSceneNodes[i], shaderIdx);
@@ -84,7 +86,7 @@ void RenderManager::renderObjects()
         case 2:
             GL_CHECK(glUseProgram(shaders[shaderIdx]->programID()))
             GL_CHECK(glViewport(0, 0, window.GetWidth(), window.GetHeight()))
-            GL_CHECK(setCamera())
+            GL_CHECK(setCameraDOF())
             for(int i = 0; i < root->mNumOfScene; i++){
                 renderScene(root->mSceneManager->mSceneNodes[i], shaderIdx);
             }
@@ -402,6 +404,63 @@ void RenderManager::setCamera() {
     inverseView[3] = vm.d1; inverseView[7] = vm.d2; inverseView[11] = vm.d3; inverseView[15] = vm.d4;
 }
 
+void RenderManager::setCameraDOF(float xoff, float yoff, float focus) {
+    // Set up the projection and model-view matrices
+    GLfloat aspectRatio = (GLfloat)window.GetWidth()/window.GetHeight();
+    GLfloat nearClip = 0.1f;
+    GLfloat farClip = 500.0f;
+    GLfloat fieldOfView = 45.0f; // Degrees
+
+    float top = tan(fieldOfView*Pi/360.f)*nearClip;
+    float bottom = -top;
+    float left  = aspectRatio*bottom;
+    float right = -left;
+    float nearVal = nearClip;
+    float farVal  = farClip;
+
+    aiVector3D view = root->target - root->eye;
+    xoff  = 0.05f;
+    yoff  = 0.05f;
+    focus = view.Length();
+
+    switch(renderPosition){
+        case 0: xoff =  0.0f; yoff =  0.0f; break;
+        case 1: xoff =  xoff; yoff =  yoff; break;
+        case 2: xoff =  xoff; yoff = -yoff; break;
+        case 3: xoff = -xoff; yoff =  yoff; break;
+        case 4: xoff = -xoff; yoff = -yoff; break;
+        default: break;
+    }
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    // gluPerspective(fieldOfView, aspectRatio, nearClip, farClip);
+    // glFrustum(left, right, bottom, top, nearVal, farVal);
+    glFrustum(left   - xoff*nearVal/focus, 
+              right  - xoff*nearVal/focus,
+              bottom - yoff*nearVal/focus,
+              top    - yoff*nearVal/focus,
+              nearVal, farVal);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glTranslatef(-xoff, -yoff, 0.0f);
+    gluLookAt(root->eye.x, root->eye.y, root->eye.z, 
+              root->target.x, root->target.y, root->target.z, 
+              root->up.x, root->up.y, root->up.z);
+
+    GLfloat v[16];
+    GL_CHECK(glGetFloatv(GL_MODELVIEW_MATRIX, v))
+    aiMatrix4x4 vm(v[0],v[4],v[8],v[12],
+                   v[1],v[5],v[9],v[13],
+                   v[2],v[6],v[10],v[14],
+                   v[3],v[7],v[11],v[15]);
+    vm.Inverse();
+    inverseView[0] = vm.a1; inverseView[4] = vm.a2; inverseView[8]  = vm.a3; inverseView[12] = vm.a4;
+    inverseView[1] = vm.b1; inverseView[5] = vm.b2; inverseView[9]  = vm.b3; inverseView[13] = vm.b4;
+    inverseView[2] = vm.c1; inverseView[6] = vm.c2; inverseView[10] = vm.c3; inverseView[14] = vm.c4;
+    inverseView[3] = vm.d1; inverseView[7] = vm.d2; inverseView[11] = vm.d3; inverseView[15] = vm.d4;
+}
+
 void RenderManager::setLight() {
 
     for(int i = 0; i < root->mNumOfLights; i++){
@@ -474,6 +533,7 @@ void RenderManager::renderSkyBox()
     GL_CHECK(glViewport(0,0,window.GetWidth(),window.GetHeight()))
     GL_CHECK(glMatrixMode(GL_MODELVIEW))
     GL_CHECK(glPushMatrix())
+    GL_CHECK(setCamera())
     GL_CHECK(glLoadIdentity())
     GL_CHECK(gluLookAt(0,0,0, root->target.x-root->eye.x, root->target.y-root->eye.y, root->target.z-root->eye.z, 0,1,0))
 

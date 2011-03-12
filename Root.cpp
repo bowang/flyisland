@@ -21,6 +21,7 @@ Root::Root(string configFileName)
         viewMode = FreeView;
     mHighSpeed = false;
     mAirplaneCrash = false;
+    mDepthOfField = false;
 }
 
 bool Root::loadConfigFile()
@@ -64,11 +65,20 @@ void Root::run()
 
         GL_CHECK(glClear(GL_ACCUM_BUFFER_BIT))
         int run = 1;
-        if(mHighSpeed)
-            run = 10;
+        if(mHighSpeed) run = 10;
         for(int i = 0; i < run; i++){
             mSceneManager->updateWorld();
-            mRenderManager->renderFrame();
+            if(mDepthOfField){
+                GL_CHECK(glClear(GL_ACCUM_BUFFER_BIT))
+                for(int j = 0; j < 5; j++){
+                    mRenderManager->renderFrame(j);
+                    GL_CHECK(glAccum(GL_ACCUM, 0.1f))
+                }
+                GL_CHECK(glAccum(GL_RETURN, 1.f))
+            }
+            else{
+                mRenderManager->renderFrame();
+            }
             GL_CHECK(glAccum(GL_ACCUM, 1.f/float(run)))
         }
         GL_CHECK(glAccum(GL_RETURN, 1.f))

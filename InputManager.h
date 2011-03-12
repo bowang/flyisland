@@ -21,6 +21,7 @@ private:
     float delta;
     float dPitch;
     float dYaw;
+    bool prevDepthOfField;
 
 protected:
 

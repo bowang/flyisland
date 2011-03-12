@@ -48,6 +48,24 @@ void InputManager::handleInput()
             case sf::Key::Space:
                 root->mSceneManager->genCannonParticle();
                 break;
+            case sf::Key::F:
+                root->mDepthOfField = !root->mDepthOfField;
+                break;
+            case sf::Key::LShift:
+                root->mHighSpeed = true;
+                prevDepthOfField = root->mDepthOfField;
+                root->mDepthOfField = false;
+                break;
+            default:
+                break;
+            }
+            break;
+        case sf::Event::KeyReleased:
+            switch (evt.Key.Code) {
+            case sf::Key::LShift:
+                root->mHighSpeed = false;
+                root->mDepthOfField = prevDepthOfField;
+                break;
             default:
                 break;
             }
@@ -230,13 +248,6 @@ void InputManager::handleInput()
         v.x = lenxz * cos(yaw);
         v.z = lenxz * sin(yaw);
         root->mSceneManager->flyDirection = root->airplane->mPosition + v;
-    }
-
-    if(input.IsKeyDown(sf::Key::LShift)){
-        root->mHighSpeed = true;
-    }
-    else{
-        root->mHighSpeed = false;
     }
 
     if(mouseCaptureEnabled){

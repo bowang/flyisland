@@ -14,7 +14,7 @@ public:
     RenderManager(Root* root);
     void initOpenGL();
     void preprocess();
-    void renderFrame();
+    void renderFrame(int j=0);
 
 private:
     Root* root;
@@ -32,6 +32,7 @@ private:
     void setTextures(vector<TextureSet> &textures, aiMesh* mesh, Shader* shader);
     void setMeshData(aiMesh* mesh, Shader* shader);
     void setCamera();
+    void setCameraDOF(float xoff=0.f, float yoff=0.f, float focus=1.f);
     void setLight();
 
     void renderCubeFaces(SceneNode &scene);
@@ -40,6 +41,7 @@ private:
     void renderTriangles(Shader* shader);
 
     GLuint tColorCubeMap;
+    int renderPosition;
 
 protected:
 
