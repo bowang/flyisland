@@ -19,12 +19,14 @@ public:
     aiVector3D mRotate;
     float      mRotateAngle;
     aiVector3D mScale;
+    aiVector3D mVelocity;
     const aiScene* mScene;
     Assimp::Importer mImporter;
     vector<TextureSet> mTexture;
     vector< vector<unsigned> >   mIndexBuffer;
     int index;
     bool fixed;
+    bool target;
 
     bool ReadFile(const std::string &pFile, unsigned int pFlags);
     void initialize(int i, const char* configFileName);

@@ -39,6 +39,7 @@ private:
     void setCameraForCube(GLuint face);
     void renderSkyBox();
     void renderTriangles(Shader* shader);
+    void renderBoundingBox(Shader* shader);
 
     GLuint tColorCubeMap;
     int renderPosition;

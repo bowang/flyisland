@@ -39,10 +39,8 @@ void SceneManager::loadAssets()
     }
 
     // build kdTree
-    
-    int j;
-    if(root->mEnableAirplane) j = 2;
-    else j = 0;
+    int j = 0;
+    if(root->mEnableAirplane) j = 1;
     for( ; j < root->mNumOfScene; j++){
         if(mSceneNodes[j].fixed){
             genTriangleVertices(mSceneNodes[j]);
@@ -51,6 +49,16 @@ void SceneManager::loadAssets()
     }
     kdtree = new kdTree(triVertices, triNormals);
     printf("[SceneManager] kdTree is built.\n");
+
+    // build bounding box list for target(movable) scenes
+    j = 0;
+    if(root->mEnableAirplane) j = 1;
+    for( ; j < root->mNumOfScene; j++){
+        if(mSceneNodes[j].target){
+            genBoundingBox(j);
+            printf("[SceneManager] bounding box built for scene[%d]\n", j);
+        }
+    }
 
     // load images for skybox
     for(int i = 0; i < 5; i++){
@@ -87,6 +95,96 @@ void SceneManager::loadAssets()
 
     }
 }
+
+void SceneManager::genBoundingBox(int sceneIdx)
+{
+    min_x = FLT_MAX;
+    min_y = FLT_MAX;
+    min_z = FLT_MAX;
+    max_x =-FLT_MAX;
+    max_y =-FLT_MAX;
+    max_z =-FLT_MAX;
+
+    loadIdentity(modelMatrix);
+    findBox(mSceneNodes[sceneIdx].mScene->mRootNode, mSceneNodes[sceneIdx].mScene);
+    
+    BoundingBox box(min_x, min_y, min_z, max_x, max_y, max_z);
+    box.index = sceneIdx;
+    originalBoundingBox.push_back(box);
+}
+
+void SceneManager::findBox(aiNode* node, const aiScene* scene)
+{
+    modelMatrixStack.push(modelMatrix);
+    modelMatrix = node->mTransformation * modelMatrix;
+
+    for(unsigned i = 0; i < node->mNumMeshes; i++){
+        aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+        for(unsigned j = 0; j < mesh->mNumFaces; j++){
+            aiFace& face = mesh->mFaces[j];
+            aiVector3D p1 = modelMatrix * mesh->mVertices[face.mIndices[0]];
+            aiVector3D p2 = modelMatrix * mesh->mVertices[face.mIndices[1]];
+            aiVector3D p3 = modelMatrix * mesh->mVertices[face.mIndices[2]];
+            testMaxMin(p1);
+            testMaxMin(p2);
+            testMaxMin(p3);
+        }
+    }
+
+    for(unsigned i = 0; i < node->mNumChildren; i++){
+        findBox(node->mChildren[i], scene);
+    }
+
+    modelMatrix = modelMatrixStack.top();
+    modelMatrixStack.pop();
+}
+
+void SceneManager::testMaxMin(aiVector3D& v)
+{
+    if(v.x > max_x) max_x = v.x;
+    else if(v.x < min_x) min_x = v.x;
+    if(v.y > max_y) max_y = v.y;
+    else if(v.y < min_y) min_y = v.y;
+    if(v.z > max_z) max_z = v.z;
+    else if(v.z < min_z) min_z = v.z;
+}
+
+void SceneManager::buildBoundingBoxBuffer()
+{
+    bbEdges.clear();
+    for(unsigned i = 0; i < mBoundingBox.size(); i++){
+        BoundingBox &bb = mBoundingBox[i];
+        
+        bbEdges.push_back(aiVector3D(bb.min[0],bb.min[1],bb.min[2]));
+        bbEdges.push_back(aiVector3D(bb.max[0],bb.min[1],bb.min[2]));
+        bbEdges.push_back(aiVector3D(bb.min[0],bb.min[1],bb.min[2]));
+        bbEdges.push_back(aiVector3D(bb.min[0],bb.min[1],bb.max[2]));
+        bbEdges.push_back(aiVector3D(bb.min[0],bb.min[1],bb.min[2]));
+        bbEdges.push_back(aiVector3D(bb.min[0],bb.max[1],bb.min[2]));
+
+        bbEdges.push_back(aiVector3D(bb.max[0],bb.min[1],bb.max[2]));
+        bbEdges.push_back(aiVector3D(bb.min[0],bb.min[1],bb.max[2]));
+        bbEdges.push_back(aiVector3D(bb.max[0],bb.min[1],bb.max[2]));
+        bbEdges.push_back(aiVector3D(bb.max[0],bb.min[1],bb.min[2]));
+        bbEdges.push_back(aiVector3D(bb.max[0],bb.min[1],bb.max[2]));
+        bbEdges.push_back(aiVector3D(bb.max[0],bb.max[1],bb.max[2]));
+
+        bbEdges.push_back(aiVector3D(bb.min[0],bb.max[1],bb.max[2]));
+        bbEdges.push_back(aiVector3D(bb.min[0],bb.max[1],bb.min[2]));
+        bbEdges.push_back(aiVector3D(bb.min[0],bb.max[1],bb.max[2]));
+        bbEdges.push_back(aiVector3D(bb.min[0],bb.min[1],bb.max[2]));
+        bbEdges.push_back(aiVector3D(bb.min[0],bb.max[1],bb.max[2]));
+        bbEdges.push_back(aiVector3D(bb.max[0],bb.max[1],bb.max[2]));
+
+        bbEdges.push_back(aiVector3D(bb.max[0],bb.max[1],bb.min[2]));
+        bbEdges.push_back(aiVector3D(bb.min[0],bb.max[1],bb.min[2]));
+        bbEdges.push_back(aiVector3D(bb.max[0],bb.max[1],bb.min[2]));
+        bbEdges.push_back(aiVector3D(bb.max[0],bb.min[1],bb.min[2]));
+        bbEdges.push_back(aiVector3D(bb.max[0],bb.max[1],bb.min[2]));
+        bbEdges.push_back(aiVector3D(bb.max[0],bb.max[1],bb.max[2]));
+    }
+}
+
 
 void SceneManager::initializeWorld()
 {
@@ -163,6 +261,13 @@ void SceneManager::updateWorld()
         }
         cameraClock.Reset();
     }
+
+    // update targets
+    updateTargets();
+
+    // update bounding box
+    updateBoundingBox();
+    buildBoundingBoxBuffer();
 
     // update particle
     updateParticles();
@@ -256,8 +361,6 @@ void SceneManager::genTriangle(const aiScene* scene, aiNode* node){
 
     modelMatrixStack.push(modelMatrix);
     modelMatrix = node->mTransformation * modelMatrix;
-    aiMatrix4x4 m = modelMatrix;
-    m.Inverse().Transpose();
 
     for(unsigned i = 0; i < node->mNumMeshes; i++){
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
@@ -290,4 +393,32 @@ void SceneManager::genCannonParticle()
     v *= mParticleTypes[0].speed;
     CannonParticle ball(root->airplane->mPosition, v);
     mCannonParticles.push_back(ball);
+}
+
+void SceneManager::updateBoundingBox()
+{
+    mBoundingBox.clear();
+    mBoundingBox.reserve(originalBoundingBox.size());
+    for(unsigned i = 0; i < originalBoundingBox.size(); i++){
+        BoundingBox bb = originalBoundingBox[i];
+        SceneNode& scene = mSceneNodes[bb.index];
+        aiMatrix4x4 translate, rotate, scale, matrix;
+        aiVector3D new_position = aiVector3D(scene.mPosition.x, scene.mPosition.y, scene.mPosition.z);
+        translate.Translation(new_position, translate);
+        rotate.Rotation(scene.mRotateAngle/180.f*Pi, scene.mRotate, rotate);
+        scale.Scaling(scene.mScale,scale);
+        matrix *= translate;
+        matrix *= rotate;
+        matrix *= scale;
+        bb.multiMatrix(matrix);
+        mBoundingBox.push_back(bb);
+    }
+}
+
+void SceneManager::updateTargets()
+{
+    for(unsigned i = 0; i < mSceneNodes.size(); i++){
+        if(mSceneNodes[i].fixed) continue;
+        mSceneNodes[i].mPosition += mSceneNodes[i].mVelocity;
+    }
 }

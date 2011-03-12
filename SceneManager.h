@@ -18,6 +18,7 @@ public:
     void initializeWorld();
     void updateWorld();
     void genCannonParticle();
+    void buildBoundingBoxBuffer();
 
     vector<SceneNode> mSceneNodes;
     vector<Particle>  mParticleTypes;
@@ -28,6 +29,7 @@ public:
     std::vector<aiVector3D> triVertices;
     std::vector<aiVector3D> triNormals;
     kdTree* kdtree;
+    vector<aiVector3D> bbEdges;
 
     float flySpeed;
     aiVector3D flyDirection;
@@ -47,11 +49,19 @@ private:
     sf::Clock cannonClock;
     std::stack<aiMatrix4x4> modelMatrixStack;
     aiMatrix4x4 modelMatrix;
+    vector<BoundingBox> originalBoundingBox;
+    float min_x, min_y, min_z,
+          max_x, max_y, max_z;
 
     void updateAirplane();
     void updateParticles();
+    void updateBoundingBox();
+    void updateTargets();
     void genTriangleVertices(SceneNode& scene);
     void genTriangle(const aiScene* scene, aiNode* node);
+    void genBoundingBox(int j);
+    void findBox(aiNode* node, const aiScene* scene);
+    void testMaxMin(aiVector3D& v);
 
 protected:
 

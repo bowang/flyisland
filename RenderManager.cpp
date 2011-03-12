@@ -61,7 +61,8 @@ void RenderManager::renderFrame(int j)
 
     // render triangles for testing purpose
     // renderTriangles(shaders[3]);
-    
+    renderBoundingBox(shaders[3]);
+
     // render particles here
     renderParticles(shaders[4]);
 
@@ -419,8 +420,8 @@ void RenderManager::setCameraDOF(float xoff, float yoff, float focus) {
     float farVal  = farClip;
 
     aiVector3D view = root->target - root->eye;
-    xoff  = 0.05f;
-    yoff  = 0.05f;
+    xoff  = 0.03f;
+    yoff  = 0.03f;
     focus = view.Length();
 
     switch(renderPosition){
@@ -680,4 +681,33 @@ void RenderManager::renderParticles(Shader* shader){
 
 }
 
+void RenderManager::renderBoundingBox(Shader* shader)
+{
+    GLint position;
 
+    GL_CHECK(glMatrixMode(GL_MODELVIEW))
+    GL_CHECK(glPushMatrix())
+    GL_CHECK(setCameraDOF())
+    GL_CHECK(glUseProgram(shader->programID()))
+    GL_CHECK(glViewport(0, 0, window.GetWidth(), window.GetHeight()))
+
+    GL_CHECK(glPolygonMode(GL_FRONT_AND_BACK, GL_LINE))
+    GL_CHECK(glLineWidth(1.0f))
+    GL_CHECK(position = glGetAttribLocation(shader->programID(), "positionIn"))
+    GL_CHECK(glEnableVertexAttribArray(position))
+    GL_CHECK(glVertexAttribPointer(position, 3, GL_FLOAT, 0, sizeof(aiVector3D), &(root->mSceneManager->bbEdges[0])))
+    GL_CHECK(glDrawArrays(GL_LINES, 0, root->mSceneManager->bbEdges.size()))
+    //GL_CHECK(glVertexAttribPointer(position, 3, GL_FLOAT, 0, sizeof(aiVector3D), &tri[0]))
+    //GL_CHECK(glDrawArrays(GL_TRIANGLES, 0, tri.size()))
+    GL_CHECK(glPolygonMode(GL_FRONT_AND_BACK, GL_FILL))
+
+    /*
+    // draw fore front
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    GL_CHECK(glPointSize(7.0f))
+    GL_CHECK(glVertexAttribPointer(position, 3, GL_FLOAT, 0, sizeof(aiVector3D), &center))
+    GL_CHECK(glDrawArrays(GL_POINTS, 0, 1))
+    */
+
+    GL_CHECK(glPopMatrix())
+}

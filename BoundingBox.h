@@ -31,6 +31,22 @@ struct BoundingBox{
         minLen = (minLen>(max[2]-min[2]))?max[2]-min[2]:minLen;
         return minLen;
     }
+    void multiMatrix(aiMatrix4x4& m){
+        float min_new[3];
+        min_new[0] = min[0]*m.a1 + min[1]*m.a2 + min[2]*m.a3 + m.a4;
+        min_new[1] = min[0]*m.b1 + min[1]*m.b2 + min[2]*m.b3 + m.b4;
+        min_new[2] = min[0]*m.c1 + min[1]*m.c2 + min[2]*m.c3 + m.c4;
+        min[0] = min_new[0];
+        min[1] = min_new[1];
+        min[2] = min_new[2];
+        float max_new[3];
+        max_new[0] = max[0]*m.a1 + max[1]*m.a2 + max[2]*m.a3 + m.a4;
+        max_new[1] = max[0]*m.b1 + max[1]*m.b2 + max[2]*m.b3 + m.b4;
+        max_new[2] = max[0]*m.c1 + max[1]*m.c2 + max[2]*m.c3 + m.c4;
+        max[0] = max_new[0];
+        max[1] = max_new[1];
+        max[2] = max_new[2];
+    }
     // following three functions are referred to 3D Programming Weekly
     // http://www.3dkingdoms.com/weekly/weekly.php?a=3
     bool isLineIntersectBox(aiVector3D& L1, aiVector3D& L2){

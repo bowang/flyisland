@@ -43,7 +43,7 @@ bool Root::loadConfigFile()
     mNumOfParticles = GetPrivateProfileInt("General", "NumOfParticles", 0, mConfigFileName.c_str());
     printf("[Root] NumOfParticles = %d\n", mNumOfParticles);
 
-    mEnableAirplane = (bool)GetPrivateProfileInt("General", "EnableAirplane", 0, mConfigFileName.c_str());
+    mEnableAirplane = GetPrivateProfileBool("General", "EnableAirplane", false, mConfigFileName.c_str());
     printf("[Root] EnableAirplane = %d\n", (int)mEnableAirplane);
 
     return true;
@@ -53,7 +53,7 @@ void Root::run()
 {
     mRenderManager->initOpenGL();
 
-    // first loadAssets, then initializeWorld, otherwise flyDirection is not correct
+    // first loadAssets, then initializeWorld, otherwise flyDirection is incorrect
     mSceneManager->loadAssets();
     mSceneManager->initializeWorld();
 

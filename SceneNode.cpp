@@ -4,6 +4,7 @@ SceneNode::SceneNode()
 {
     index = -1;
     fixed = false;
+    target = false;
 }
 
 bool SceneNode::ReadFile(const std::string &pFile, unsigned int pFlags)
@@ -73,6 +74,10 @@ void SceneNode::loadParameters(const char* sceneName, const char* configFileName
     mScale.y = GetPrivateProfileFloat(sceneName, "scaleY", 1.0f, configFileName);
     mScale.z = GetPrivateProfileFloat(sceneName, "scaleZ", 1.0f, configFileName);
 
+    mVelocity.x = GetPrivateProfileFloat(sceneName, "speedX", 0.0f, configFileName);
+    mVelocity.y = GetPrivateProfileFloat(sceneName, "speedY", 0.0f, configFileName);
+    mVelocity.z = GetPrivateProfileFloat(sceneName, "speedZ", 0.0f, configFileName);
+
     mShaderList.clear();
     char shaderList[BUFFER_SIZE];
     GetPrivateProfileString(sceneName, "shader", "0", shaderList, sizeof(shaderList), configFileName);
@@ -87,6 +92,7 @@ void SceneNode::loadParameters(const char* sceneName, const char* configFileName
     printf("\n");
 
     fixed = GetPrivateProfileBool(sceneName, "fixed", false, configFileName);
+    target = GetPrivateProfileBool(sceneName, "target", false, configFileName);
 }
 
 void SceneNode::buildIndexBuffer()
