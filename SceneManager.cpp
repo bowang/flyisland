@@ -418,7 +418,7 @@ void SceneManager::updateBoundingBox()
 void SceneManager::updateTargets()
 {
     for(unsigned i = 0; i < mSceneNodes.size(); i++){
-        if(mSceneNodes[i].fixed) continue;
-        mSceneNodes[i].mPosition += mSceneNodes[i].mVelocity;
+        if(mSceneNodes[i].target)
+            mSceneNodes[i].mPosition += mSceneNodes[i].mVelocity;
     }
 }

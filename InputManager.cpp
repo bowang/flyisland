@@ -47,6 +47,7 @@ void InputManager::handleInput()
                 break;
             case sf::Key::Space:
                 root->mSceneManager->genCannonParticle();
+                root->mSoundManager->play(Fire);
                 break;
             case sf::Key::F:
                 root->mDepthOfField = !root->mDepthOfField;

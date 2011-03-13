@@ -17,6 +17,7 @@
 // SFML automatically includes SDL headers
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 
 // Open Asset Import Library
 #include <assimp.hpp>

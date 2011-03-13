@@ -5,6 +5,7 @@
 #include "SceneManager.h"
 #include "RenderManager.h"
 #include "InputManager.h"
+#include "SoundManager.h"
 
 struct Light{
     float position[4];
@@ -52,6 +53,7 @@ public:
     SceneManager*  mSceneManager;
     RenderManager* mRenderManager;
     InputManager*  mInputManager;
+    SoundManager*  mSoundManager;
 
 private:
     bool loadConfigFile();

@@ -12,9 +12,10 @@ Root::Root(string configFileName)
     mConfigFileName = configFileName;
     loadConfigFile();
 
-    mSceneManager = new SceneManager(this);
+    mSceneManager  = new SceneManager(this);
     mRenderManager = new RenderManager(this);
-    mInputManager = new InputManager(this);
+    mInputManager  = new InputManager(this);
+    mSoundManager  = new SoundManager(this);
     if(mEnableAirplane)
         viewMode = FollowView;
     else
@@ -56,6 +57,9 @@ void Root::run()
     // first loadAssets, then initializeWorld, otherwise flyDirection is incorrect
     mSceneManager->loadAssets();
     mSceneManager->initializeWorld();
+
+    mSoundManager->loadAssets();
+    mSoundManager->play(Background);
 
     mRenderManager->preprocess();
 

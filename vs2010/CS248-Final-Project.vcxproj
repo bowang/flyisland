@@ -21,6 +21,7 @@
     <ClCompile Include="..\SceneManager.cpp" />
     <ClCompile Include="..\SceneNode.cpp" />
     <ClCompile Include="..\Shader.cpp" />
+    <ClCompile Include="..\SoundManager.cpp" />
     <ClCompile Include="..\Utility.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -37,6 +38,7 @@
     <ClInclude Include="..\SceneManager.h" />
     <ClInclude Include="..\SceneNode.h" />
     <ClInclude Include="..\Shader.h" />
+    <ClInclude Include="..\SoundManager.h" />
     <ClInclude Include="..\Utility.h" />
   </ItemGroup>
   <ItemGroup>
