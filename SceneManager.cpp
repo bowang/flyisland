@@ -286,12 +286,12 @@ void SceneManager::updateAirplane()
     pitchAxis = cross(v, root->up);
     pitch = 0.0f;
     if(fabs(v.y) > EPSILON){
-        pitch = fabs(v.y)/v.y*acos(dot(v,h))/Pi*180.0f;
+        pitch = fabs(v.y)/v.y*acos(DOT(v,h))/Pi*180.0f;
     }
     yawAxis = root->up;
     yaw = 0.0f;
     if(fabs(v.z) > EPSILON)
-        yaw = -fabs(v.z)/v.z*acos(dot(h,aiVector3D(1.f,0.f,0.f)))/Pi*180.0f;
+        yaw = -fabs(v.z)/v.z*acos(DOT(h,aiVector3D(1.f,0.f,0.f)))/Pi*180.0f;
 
     float speed = flySpeed;
     if(root->mHighSpeed) speed *= 7;

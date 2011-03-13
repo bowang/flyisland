@@ -13,6 +13,12 @@ GLfloat dot(aiVector3D a, aiVector3D b){
     return res;
 }
 
+GLfloat DOT(aiVector3D a, aiVector3D b){
+    GLfloat res = a.x*b.x + a.y*b.y + a.z*b.z;
+    if(res > 1.f) res = 1.f; 
+    else if(res < -1.f) res = -1.f;
+    return res;
+}
 
 // out = in1 * in2
 void multMatrixf(GLfloat* out, GLfloat* in1, GLfloat* in2){

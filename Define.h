@@ -16,7 +16,6 @@
 #endif
 
 #undef _DEBUG   // force to print out glError even in Release mode
-
 #if _DEBUG
 #define GL_CHECK(x) {\
   (x);\
@@ -30,5 +29,6 @@
   (x);\
 }
 #endif
+
 
 #endif

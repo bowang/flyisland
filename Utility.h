@@ -10,6 +10,8 @@ aiVector3D cross(aiVector3D a, aiVector3D b);
 
 GLfloat dot(aiVector3D a, aiVector3D b);
 
+GLfloat DOT(aiVector3D a, aiVector3D b);
+
 void multMatrixf(GLfloat* out, GLfloat* in1, GLfloat* in2);
 
 void loadIdentity(GLfloat* m);
