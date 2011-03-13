@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="..\CannonParticle.cpp" />
     <ClCompile Include="..\DepthRenderTarget.cpp" />
+    <ClCompile Include="..\FireParticle.cpp" />
     <ClCompile Include="..\InputManager.cpp" />
     <ClCompile Include="..\kdTree.cpp" />
     <ClCompile Include="..\Main.cpp" />
@@ -29,6 +30,7 @@
     <ClInclude Include="..\CannonParticle.h" />
     <ClInclude Include="..\Define.h" />
     <ClInclude Include="..\DepthRenderTarget.h" />
+    <ClInclude Include="..\FireParticle.h" />
     <ClInclude Include="..\Framework.h" />
     <ClInclude Include="..\InputManager.h" />
     <ClInclude Include="..\kdTree.h" />

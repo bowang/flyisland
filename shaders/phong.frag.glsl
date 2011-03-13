@@ -35,7 +35,7 @@ void main() {
     vec3 R = reflect(-L, N);
     float Rs = pow(max(0.0, dot(V, R)), alpha);
     vec3 Ts = texture2D(specularMap, texcoord).rgb;
-    vec3 specular = Rs * Ks * Ts * gl_LightSource[0].specular.rgb;
+    vec3 specular = Rs * Ks * gl_LightSource[0].specular.rgb;
 
     // Ambient is easy
     vec3 ambient = Ka * gl_LightSource[0].ambient.rgb;

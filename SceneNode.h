@@ -27,6 +27,7 @@ public:
     int index;
     bool fixed;
     bool target;
+    bool hit;
 
     bool ReadFile(const std::string &pFile, unsigned int pFlags);
     void initialize(int i, const char* configFileName);

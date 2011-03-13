@@ -37,6 +37,7 @@ void SceneManager::loadAssets()
 
         mSceneNodes[i].initialize(i, root->mConfigFileName.c_str());
     }
+    printf("\n");
 
     // build kdTree
     int j = 0;
@@ -236,6 +237,7 @@ void SceneManager::initializeWorld()
     airplaneClock.Reset();
     cameraClock.Reset();
     collisionClock.Reset();
+    fireClock.Reset();
 }
 
 void SceneManager::updateWorld()
@@ -262,15 +264,16 @@ void SceneManager::updateWorld()
         cameraClock.Reset();
     }
 
-    // update targets
-    updateTargets();
-
+    // update particle
+    updateParticles();
+    
     // update bounding box
     updateBoundingBox();
     buildBoundingBoxBuffer();
 
-    // update particle
-    updateParticles();
+    // update targets
+    updateTargets();
+
 }
 
 void SceneManager::updateAirplane()
@@ -339,8 +342,16 @@ void SceneManager::updateParticles(){
         cannonClock.Reset();
     }
 
-    // update smoke particles
-
+    // update fire particles
+    if(fireClock.GetElapsedTime() > 0.01f) {
+        for(unsigned i = 0; i < mFireParticles.size(); i++){
+            if(!mFireParticles[i].update()){
+                mFireParticles.erase(mFireParticles.begin()+i);
+                i--;
+            }
+        }
+        fireClock.Reset();
+    }
 }
 
 void SceneManager::genTriangleVertices(SceneNode& scene){
@@ -391,8 +402,14 @@ void SceneManager::genCannonParticle()
     aiVector3D v = flyDirection - root->airplane->mPosition;
     v.Normalize();
     v *= mParticleTypes[0].speed;
-    CannonParticle ball(root->airplane->mPosition, v);
+    CannonParticle ball(root->airplane->mPosition, v, root);
     mCannonParticles.push_back(ball);
+}
+
+void SceneManager::genFireParticle(aiVector3D position)
+{
+    FireParticle fire(position);
+    mFireParticles.push_back(fire);
 }
 
 void SceneManager::updateBoundingBox()
@@ -418,7 +435,16 @@ void SceneManager::updateBoundingBox()
 void SceneManager::updateTargets()
 {
     for(unsigned i = 0; i < mSceneNodes.size(); i++){
-        if(mSceneNodes[i].target)
+        if(mSceneNodes[i].target==true && mSceneNodes[i].hit==false){
             mSceneNodes[i].mPosition += mSceneNodes[i].mVelocity;
+        }
+    }
+}
+
+void SceneManager::hitTarget(int i)
+{
+    if(mSceneNodes[i].hit==false){
+        mSceneNodes[i].hit = true;
+        genFireParticle(mSceneNodes[i].mPosition);
     }
 }

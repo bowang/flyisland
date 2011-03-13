@@ -23,6 +23,7 @@ Root::Root(string configFileName)
     mHighSpeed = false;
     mAirplaneCrash = false;
     mDepthOfField = false;
+    mHitCount = 0;
 }
 
 bool Root::loadConfigFile()

@@ -6,6 +6,7 @@
 #include "kdTree.h"
 #include "Particle.h"
 #include "CannonParticle.h"
+#include "FireParticle.h"
 #include <stack>
 
 class Root;
@@ -18,11 +19,14 @@ public:
     void initializeWorld();
     void updateWorld();
     void genCannonParticle();
+    void genFireParticle(aiVector3D position);
     void buildBoundingBoxBuffer();
+    void hitTarget(int i);
 
     vector<SceneNode> mSceneNodes;
     vector<Particle>  mParticleTypes;
     vector<CannonParticle> mCannonParticles;
+    vector<FireParticle> mFireParticles;
     sf::Image mSkybox[5];
 
     vector<BoundingBox> mBoundingBox;
@@ -47,6 +51,7 @@ private:
     sf::Clock cameraClock;
     sf::Clock collisionClock;
     sf::Clock cannonClock;
+    sf::Clock fireClock;
     std::stack<aiMatrix4x4> modelMatrixStack;
     aiMatrix4x4 modelMatrix;
     vector<BoundingBox> originalBoundingBox;

@@ -80,7 +80,8 @@ void RenderManager::renderObjects()
             GL_CHECK(setCameraDOF())
             GL_CHECK(setLight())
             for(unsigned i = 0; i < root->mSceneManager->mSceneNodes.size(); i++){
-                renderScene(root->mSceneManager->mSceneNodes[i], shaderIdx);
+                if(root->mSceneManager->mSceneNodes[i].hit==false)
+                    renderScene(root->mSceneManager->mSceneNodes[i], shaderIdx);
             }
             break;
 
@@ -89,7 +90,8 @@ void RenderManager::renderObjects()
             GL_CHECK(glViewport(0, 0, window.GetWidth(), window.GetHeight()))
             GL_CHECK(setCameraDOF())
             for(int i = 0; i < root->mNumOfScene; i++){
-                renderScene(root->mSceneManager->mSceneNodes[i], shaderIdx);
+                if(root->mSceneManager->mSceneNodes[i].hit==false)
+                    renderScene(root->mSceneManager->mSceneNodes[i], shaderIdx);
             }
             break;
 
@@ -664,12 +666,23 @@ void RenderManager::renderParticles(Shader* shader){
     GL_CHECK(glEnableVertexAttribArray(alpha))
     GL_CHECK(glVertexAttribPointer(alpha, 3, GL_FLOAT, 0, sizeof(CannonParticle), &(root->mSceneManager->mCannonParticles[0].alpha)))
     GL_CHECK(glUniform1f(baseSize,  root->mSceneManager->mParticleTypes[0].size))
-    unsigned numParticles = root->mSceneManager->mCannonParticles.size();
-    if(numParticles > 0)
-        GL_CHECK(glDrawArrays(GL_POINTS, 0, numParticles))
+    unsigned numCannonParticles = root->mSceneManager->mCannonParticles.size();
+    if(numCannonParticles > 0)
+        GL_CHECK(glDrawArrays(GL_POINTS, 0, numCannonParticles))
 
-    /*************** Render Smoke ****************/
-
+    /*************** Render Fire ****************/
+    GL_CHECK(glBlendFunc(GL_SRC_ALPHA, GL_ONE))
+    GL_CHECK(glActiveTexture(GL_TEXTURE4))
+    root->mSceneManager->mParticleTypes[1].Bind();
+    GL_CHECK(glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE))
+    GL_CHECK(glEnableVertexAttribArray(position))
+    GL_CHECK(glVertexAttribPointer(position, 3, GL_FLOAT, 0, sizeof(FireParticle), &(root->mSceneManager->mFireParticles[0].position)))
+    GL_CHECK(glEnableVertexAttribArray(alpha))
+    GL_CHECK(glVertexAttribPointer(alpha, 3, GL_FLOAT, 0, sizeof(FireParticle), &(root->mSceneManager->mFireParticles[0].alpha)))
+    GL_CHECK(glUniform1f(baseSize,  root->mSceneManager->mParticleTypes[1].size))
+    unsigned numFireParticles = root->mSceneManager->mFireParticles.size();
+    if(numFireParticles > 0)
+        GL_CHECK(glDrawArrays(GL_POINTS, 0, numFireParticles))
 
 
 

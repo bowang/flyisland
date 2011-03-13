@@ -37,6 +37,7 @@ public:
     bool   mHighSpeed;
     bool   mAirplaneCrash;
     bool   mDepthOfField;
+    int    mHitCount;
 
     // Camera parameters
     aiVector3D eye;

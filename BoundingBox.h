@@ -8,6 +8,7 @@ struct BoundingBox{
         max[0] = max[1] = max[2] = FLT_MIN;
         min[0] = min[1] = min[2] = FLT_MAX;
         index = -1;  // indicating it's not for a single triangle
+        hit = false;
     }
     BoundingBox(float min_x, float min_y, float min_z,
                 float max_x, float max_y, float max_z){
@@ -22,6 +23,7 @@ struct BoundingBox{
     float min[3];
     float max[3];
     int index;
+    bool hit;
     float volume(){
         return (max[0]-min[0])*(max[1]-min[1])*(max[2]-min[2]);
     }

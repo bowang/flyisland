@@ -5,6 +5,7 @@ SceneNode::SceneNode()
     index = -1;
     fixed = false;
     target = false;
+    hit = false;
 }
 
 bool SceneNode::ReadFile(const std::string &pFile, unsigned int pFlags)
