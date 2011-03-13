@@ -61,6 +61,7 @@ void Root::run()
 
     mSoundManager->loadAssets();
     mSoundManager->play(Background);
+    mSoundManager->loop(Background, true);
 
     mRenderManager->preprocess();
 

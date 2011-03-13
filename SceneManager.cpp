@@ -257,7 +257,7 @@ void SceneManager::updateWorld()
         }
         else if(root->viewMode==FlyView){
             aiVector3D v = flyDirection - root->airplane->mPosition;
-            v.Normalize();
+            if(v.Length() > EPSILON) v.Normalize();
             root->target = root->airplane->mPosition;
             root->eye = root->airplane->mPosition - v*10.f;
         }
@@ -280,17 +280,17 @@ void SceneManager::updateAirplane()
 {
     // translate airplane and airscrew
     aiVector3D v = flyDirection - root->airplane->mPosition;
-    v.Normalize();
+    if(v.Length() > EPSILON) v.Normalize();
     aiVector3D h = aiVector3D(v.x, 0.0f, v.z);
-    h.Normalize();
+    if(h.Length() > EPSILON) h.Normalize();
     pitchAxis = cross(v, root->up);
     pitch = 0.0f;
-    if(v.y != 0.0f){
+    if(fabs(v.y) > EPSILON){
         pitch = fabs(v.y)/v.y*acos(dot(v,h))/Pi*180.0f;
     }
     yawAxis = root->up;
     yaw = 0.0f;
-    if(v.z != 0.0f)
+    if(fabs(v.z) > EPSILON)
         yaw = -fabs(v.z)/v.z*acos(dot(h,aiVector3D(1.f,0.f,0.f)))/Pi*180.0f;
 
     float speed = flySpeed;

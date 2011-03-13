@@ -9,7 +9,9 @@ enum SoundType{
     Background,
     Fire,
     Hit,
-    Crash
+    Crash,
+    Success,
+    Fail
 };
 
 class SoundManager{
@@ -20,6 +22,7 @@ public:
     void loadAssets();
     void play(SoundType type);
     void setVolumn(float volumn);
+    void loop(SoundType type, bool loop);
 
 private:
     Root* root;

@@ -165,90 +165,96 @@ void InputManager::handleInput()
 
     if(input.IsKeyDown(sf::Key::W)){
         aiVector3D v = root->mSceneManager->flyDirection - root->airplane->mPosition;
-        if(v.Length() > 0.00001f) v.Normalize();
-        aiVector3D h = aiVector3D(v.x, 0.0f, v.z);
-        if(h.Length() > 0.00001f) h.Normalize();
-        float pitch = 0.0f;
-        if(v.y != 0.0f)
-            pitch = fabs(v.y)/v.y*acos(dot(v,h))/Pi*180.0f;
-        if(pitch > -60.0f)
-            pitch -= dPitch;
-        pitch = pitch/180.0f*Pi;
-        float yaw = 0.0f;
-        if(v.z != 0.0f)
-            yaw = fabs(v.z)/v.z*acos(dot(h,aiVector3D(1.f,0.f,0.f)))/Pi*180.0f;
-        yaw = yaw/180.0f*Pi;
-        v.y = sin(pitch);
-        float lenxz = cos(pitch);
-        v.x = lenxz * cos(yaw);
-        v.z = lenxz * sin(yaw);
-        root->mSceneManager->flyDirection = root->airplane->mPosition + v;
+        if(v.Length() > EPSILON){
+            v.Normalize();
+            aiVector3D h = aiVector3D(v.x, 0.0f, v.z);
+            h.Normalize();
+            float pitch = 0.0f;
+            if(fabs(v.y) > EPSILON)
+                pitch = fabs(v.y)/v.y*acos(dot(v,h))/Pi*180.0f;
+            if(pitch > -60.0f)
+                pitch -= dPitch;
+            pitch = pitch/180.0f*Pi;
+            float yaw = 0.0f;
+            if(fabs(v.z) > EPSILON)
+                yaw = fabs(v.z)/v.z*acos(dot(h,aiVector3D(1.f,0.f,0.f)))/Pi*180.0f;
+            yaw = yaw/180.0f*Pi;
+            v.y = sin(pitch);
+            float lenxz = cos(pitch);
+            v.x = lenxz * cos(yaw);
+            v.z = lenxz * sin(yaw);
+            root->mSceneManager->flyDirection = root->airplane->mPosition + v;
+        }
     }
 
     if(input.IsKeyDown(sf::Key::S)){
         aiVector3D v = root->mSceneManager->flyDirection - root->airplane->mPosition;
-        if(v.Length() > 0.00001f) v.Normalize();
-        aiVector3D h = aiVector3D(v.x, 0.0f, v.z);
-        if(h.Length() > 0.00001f) h.Normalize();
-        float pitch = 0.0f;
-        if(v.y != 0.0f)
-            pitch = fabs(v.y)/v.y*acos(dot(v,h))/Pi*180.0f;
-        if(pitch < 60.0f)
-            pitch += dPitch;
-        pitch = pitch/180.0f*Pi;
-        float yaw = 0.0f;
-        if(v.z != 0.0f)
-            yaw = fabs(v.z)/v.z*acos(dot(h,aiVector3D(1.f,0.f,0.f)))/Pi*180.0f;
-        yaw = yaw/180.0f*Pi;
-        v.y = sin(pitch);
-        float lenxz = cos(pitch);
-        v.x = lenxz * cos(yaw);
-        v.z = lenxz * sin(yaw);
-        root->mSceneManager->flyDirection = root->airplane->mPosition + v;
-    }
-
-    if(input.IsKeyDown(sf::Key::D)){
-        aiVector3D v = root->mSceneManager->flyDirection - root->airplane->mPosition;
-        if(v.Length() > 0.00001f) v.Normalize();
-        aiVector3D h = aiVector3D(v.x, 0.0f, v.z);
-        if(h.Length() > 0.00001f) h.Normalize();
-        float pitch = 0.0f;
-        if(v.y != 0.0f)
-            pitch = fabs(v.y)/v.y*acos(dot(v,h))/Pi*180.0f;
-        pitch = pitch/180.0f*Pi;
-        float yaw = 0.0f;
-        if(v.z != 0.0f)
-            yaw = fabs(v.z)/v.z*acos(dot(h,aiVector3D(1.f,0.f,0.f)))/Pi*180.0f;
-        //if(yaw < 175.0f)
-            yaw += dYaw;
-        yaw = yaw/180.0f*Pi;
-        v.y = sin(pitch);
-        float lenxz = cos(pitch);
-        v.x = lenxz * cos(yaw);
-        v.z = lenxz * sin(yaw);
-        root->mSceneManager->flyDirection = root->airplane->mPosition + v;
+        if(v.Length() > EPSILON){
+            v.Normalize();
+            aiVector3D h = aiVector3D(v.x, 0.0f, v.z);
+            if(h.Length() > EPSILON) h.Normalize();
+            float pitch = 0.0f;
+            if(fabs(v.y) > EPSILON)
+                pitch = fabs(v.y)/v.y*acos(dot(v,h))/Pi*180.0f;
+            if(pitch < 60.0f)
+                pitch += dPitch;
+            pitch = pitch/180.0f*Pi;
+            float yaw = 0.0f;
+            if(fabs(v.z) > EPSILON)
+                yaw = fabs(v.z)/v.z*acos(dot(h,aiVector3D(1.f,0.f,0.f)))/Pi*180.0f;
+            yaw = yaw/180.0f*Pi;
+            v.y = sin(pitch);
+            float lenxz = cos(pitch);
+            v.x = lenxz * cos(yaw);
+            v.z = lenxz * sin(yaw);
+            root->mSceneManager->flyDirection = root->airplane->mPosition + v;
+        }
     }
 
     if(input.IsKeyDown(sf::Key::A)){
         aiVector3D v = root->mSceneManager->flyDirection - root->airplane->mPosition;
-        if(v.Length() > 0.00001f) v.Normalize();
-        aiVector3D h = aiVector3D(v.x, 0.0f, v.z);
-        if(h.Length() > 0.00001f) h.Normalize();
-        float pitch = 0.0f;
-        if(v.y != 0.0f)
-            pitch = fabs(v.y)/v.y*acos(dot(v,h))/Pi*180.0f;
-        pitch = pitch/180.0f*Pi;
-        float yaw = 0.0f;
-        if(v.z != 0.0f)
-            yaw = fabs(v.z)/v.z*acos(dot(h,aiVector3D(1.f,0.f,0.f)))/Pi*180.0f;
-        //if(yaw > -175.0f)
+        if(v.Length() > EPSILON){
+            v.Normalize();
+            aiVector3D h = aiVector3D(v.x, 0.0f, v.z);
+            h.Normalize();
+            float pitch = 0.0f;
+            if(fabs(v.y) > EPSILON)
+                pitch = fabs(v.y)/v.y*acos(dot(v,h))/Pi*180.0f;
+            pitch = pitch/180.0f*Pi;
+            float yaw = 0.0f;
+            if(fabs(v.z) > EPSILON)
+                yaw = fabs(v.z)/v.z*acos(dot(h,aiVector3D(1.f,0.f,0.f)))/Pi*180.0f;
             yaw -= dYaw;
-        yaw = yaw/180.0f*Pi;
-        v.y = sin(pitch);
-        float lenxz = cos(pitch);
-        v.x = lenxz * cos(yaw);
-        v.z = lenxz * sin(yaw);
-        root->mSceneManager->flyDirection = root->airplane->mPosition + v;
+            yaw = yaw/180.0f*Pi;
+            v.y = sin(pitch);
+            float lenxz = cos(pitch);
+            v.x = lenxz * cos(yaw);
+            v.z = lenxz * sin(yaw);
+            root->mSceneManager->flyDirection = root->airplane->mPosition + v;
+        }
+    }
+
+    if(input.IsKeyDown(sf::Key::D)){
+        aiVector3D v = root->mSceneManager->flyDirection - root->airplane->mPosition;
+        if(v.Length() > EPSILON){
+            v.Normalize();
+            aiVector3D h = aiVector3D(v.x, 0.0f, v.z);
+            h.Normalize();
+            float pitch = 0.0f;
+            if(fabs(v.y) > EPSILON)
+                pitch = fabs(v.y)/v.y*acos(dot(v,h))/Pi*180.0f;
+            pitch = pitch/180.0f*Pi;
+            float yaw = 0.0f;
+            if(fabs(v.z) > EPSILON)
+                yaw = fabs(v.z)/v.z*acos(dot(h,aiVector3D(1.f,0.f,0.f)))/Pi*180.0f;
+            yaw += dYaw;
+            yaw = yaw/180.0f*Pi;
+            v.y = sin(pitch);
+            float lenxz = cos(pitch);
+            v.x = lenxz * cos(yaw);
+            v.z = lenxz * sin(yaw);
+            root->mSceneManager->flyDirection = root->airplane->mPosition + v;
+        }
     }
 
     if(mouseCaptureEnabled){

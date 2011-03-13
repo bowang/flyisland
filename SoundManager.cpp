@@ -86,6 +86,26 @@ void SoundManager::play(SoundType type)
 
 }
 
+void SoundManager::loop(SoundType type, bool loop)
+{
+    switch(type){
+    case Background:
+        BackgroundMusic.SetLoop(loop);
+        break;
+    case Fire:
+        FireSound.SetLoop(loop);
+        break;
+    case Hit:
+        HitSound.SetLoop(loop);
+        break;
+    case Crash:
+        CrashSound.SetLoop(loop);
+        break;
+    default:
+        break;
+    }
+}
+
 void SoundManager::setVolumn(float v)
 {
     volumn = v;
