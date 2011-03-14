@@ -92,8 +92,9 @@ void SceneNode::loadParameters(const char* sceneName, const char* configFileName
     }
     printf("\n");
 
-    fixed = GetPrivateProfileBool(sceneName, "fixed", false, configFileName);
+    fixed  = GetPrivateProfileBool(sceneName, "fixed", false, configFileName);
     target = GetPrivateProfileBool(sceneName, "target", false, configFileName);
+    score  = GetPrivateProfileInt(sceneName, "score", 0, configFileName);
 }
 
 void SceneNode::buildIndexBuffer()

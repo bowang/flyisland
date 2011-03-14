@@ -28,6 +28,7 @@ public:
     bool fixed;
     bool target;
     bool hit;
+    int  score;
 
     bool ReadFile(const std::string &pFile, unsigned int pFlags);
     void initialize(int i, const char* configFileName);
