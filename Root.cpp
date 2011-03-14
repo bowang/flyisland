@@ -27,6 +27,7 @@ Root::Root(string configFileName)
     mMinute = 0;
     mSecond = 0;
     mLevel  = 1;
+    mNumOfTargets = 0;
     if(!mFont.LoadFromFile(mFontPath)){
         printf("Failed to load font: %s\n", mFontPath.c_str());
         exit(-1);

@@ -44,6 +44,7 @@ public:
     int    mMinute;
     int    mSecond;
     int    mLevel;
+    int    mNumOfTargets;
 
     // Camera parameters
     aiVector3D eye;

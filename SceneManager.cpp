@@ -36,6 +36,7 @@ void SceneManager::loadAssets()
         }
 
         mSceneNodes[i].initialize(i, root->mConfigFileName.c_str());
+        if(mSceneNodes[i].target) root->mNumOfTargets++;
     }
     printf("\n");
 
@@ -259,7 +260,7 @@ void SceneManager::updateWorld()
             aiVector3D v = flyDirection - root->airplane->mPosition;
             if(v.Length() > EPSILON) v.Normalize();
             root->target = root->airplane->mPosition;
-            root->eye = root->airplane->mPosition - v*10.f;
+            root->eye = root->airplane->mPosition - v*7.f;
         }
         cameraClock.Reset();
     }
