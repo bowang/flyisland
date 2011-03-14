@@ -737,15 +737,32 @@ void RenderManager::renderText()
     //GL_CHECK(glDisable(GL_DEPTH_TEST))
 
     // score
-    char score[11];
-    sprintf(score, "%d", root->mPlayerScore);
-    sf::String scoreText(score, root->mFont, 60.f);
+    char score[17];
+    sprintf(score, "Score %d", root->mPlayerScore);
+    sf::String scoreText(score, root->mFont, 50.f);
     scoreText.SetColor(sf::Color(0,0,255));
-    scoreText.SetScale(1.f, 1.f);
-    scoreText.Move(950.f, 700.f);
+    scoreText.Move(800.f, 700.f);
 
+    // time
+    char time[9]; // 00:00:00
+    if(root->mSecond < 10)
+        sprintf(time, "%d:0%d", root->mMinute, root->mSecond);
+    else
+        sprintf(time, "%d:%d", root->mMinute, root->mSecond);
+    sf::String timeText(time, root->mFont, 50.f);
+    timeText.SetColor(sf::Color(255,0,0));
+    timeText.Move(WINDOW_WIDTH/2-60, 0.f);
+
+    // level
+    char level[9]; // Level 10
+    sprintf(level, "Level %d", root->mLevel);
+    sf::String levelText(level, root->mFont, 50.f);
+    levelText.SetColor(sf::Color(0,255,0));
+    levelText.Move(WINDOW_WIDTH/2-90, 700.f);
 
     window.Draw(scoreText);
+    window.Draw(timeText);
+    window.Draw(levelText);
 
     //GL_CHECK(glEnable(GL_DEPTH_TEST))
     //GL_CHECK(glDepthMask(GL_TRUE))

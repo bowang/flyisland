@@ -41,6 +41,9 @@ public:
     bool   mDepthOfField;
     int    mPlayerScore;
     sf::Font mFont;
+    int    mMinute;
+    int    mSecond;
+    int    mLevel;
 
     // Camera parameters
     aiVector3D eye;

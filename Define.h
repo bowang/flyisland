@@ -15,8 +15,11 @@
     #define PRINTF(...) 
 #endif
 
-#undef _DEBUG   // force to print out glError even in Release mode
-#if _DEBUG
+// #undef _DEBUG
+// #if _DEBUG
+
+// #define DEBUG
+#ifdef DEBUG
 #define GL_CHECK(x) {\
   (x);\
   GLenum error = glGetError();\

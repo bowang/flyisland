@@ -142,5 +142,11 @@
     <None Include="..\shaders\particle.vert.glsl">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="..\shaders\phong_color.frag.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\shaders\phong_color.vert.glsl">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

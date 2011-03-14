@@ -264,6 +264,16 @@ void SceneManager::updateWorld()
         cameraClock.Reset();
     }
 
+    // update time
+    if(timeClock.GetElapsedTime() > 1.f) {
+        root->mSecond ++;
+        if(root->mSecond == 60){
+            root->mSecond = 0;
+            root->mMinute ++;
+        }
+        timeClock.Reset();
+    }
+
     // update particle
     updateParticles();
     
@@ -419,6 +429,7 @@ void SceneManager::updateBoundingBox()
     for(unsigned i = 0; i < originalBoundingBox.size(); i++){
         BoundingBox bb = originalBoundingBox[i];
         SceneNode& scene = mSceneNodes[bb.index];
+        if(scene.hit==true) continue;
         aiMatrix4x4 translate, rotate, scale, matrix;
         aiVector3D new_position = aiVector3D(scene.mPosition.x, scene.mPosition.y, scene.mPosition.z);
         translate.Translation(new_position, translate);

@@ -24,6 +24,9 @@ Root::Root(string configFileName)
     mAirplaneCrash = false;
     mDepthOfField = false;
     mPlayerScore = 0;
+    mMinute = 0;
+    mSecond = 0;
+    mLevel  = 1;
     if(!mFont.LoadFromFile(mFontPath)){
         printf("Failed to load font: %s\n", mFontPath.c_str());
         exit(-1);
