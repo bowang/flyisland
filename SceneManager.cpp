@@ -447,8 +447,25 @@ void SceneManager::updateBoundingBox()
 void SceneManager::updateTargets()
 {
     for(unsigned i = 0; i < mSceneNodes.size(); i++){
-        if(mSceneNodes[i].target==true && mSceneNodes[i].hit==false){
-            mSceneNodes[i].mPosition += mSceneNodes[i].mVelocity;
+        SceneNode &scene = mSceneNodes[i];
+        if(scene.target==true){
+            if(scene.hit==false){
+                scene.mPosition += scene.mVelocity;
+                scene.reappearClock.Reset();
+            }
+            else if(scene.reappearClock.GetElapsedTime() > 10.f){
+                scene.hit = false;
+                aiVector3D position;
+                position.x = Random(70.f);
+                position.y = (float)fabs(Random(15.f))+10.f;
+                position.z = Random(70.f);
+                scene.mPosition = position;
+                if(position.Length() > EPSILON) position.Normalize();
+                scene.mVelocity = -position * root->mSceneManager->flySpeed * root->mLevel;
+                scene.mVelocity.x += Random(0.3f)*root->mSceneManager->flySpeed;
+                scene.mVelocity.z += Random(0.3f)*root->mSceneManager->flySpeed;
+                scene.mVelocity.y = 0.f;
+            }
         }
     }
 }
@@ -459,6 +476,7 @@ void SceneManager::hitTarget(int i)
         mSceneNodes[i].hit = true;
         root->mSoundManager->play(Hit);
         root->mPlayerScore += mSceneNodes[i].score;
+        root->mLevel = root->mPlayerScore/50 + 1;
         genFireParticle(mSceneNodes[i].mPosition);
     }
 }

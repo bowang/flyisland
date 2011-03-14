@@ -29,6 +29,7 @@ public:
     bool target;
     bool hit;
     int  score;
+    sf::Clock reappearClock;
 
     bool ReadFile(const std::string &pFile, unsigned int pFlags);
     void initialize(int i, const char* configFileName);
