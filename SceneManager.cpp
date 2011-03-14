@@ -446,7 +446,7 @@ void SceneManager::hitTarget(int i)
     if(mSceneNodes[i].hit==false){
         mSceneNodes[i].hit = true;
         root->mSoundManager->play(Hit);
-        root->mHitCount ++;
+        root->mPlayerScore ++;
         genFireParticle(mSceneNodes[i].mPosition);
     }
 }

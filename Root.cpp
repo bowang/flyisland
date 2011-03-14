@@ -23,7 +23,14 @@ Root::Root(string configFileName)
     mHighSpeed = false;
     mAirplaneCrash = false;
     mDepthOfField = false;
-    mHitCount = 0;
+    mPlayerScore = 0;
+    if(!mFont.LoadFromFile(mFontPath)){
+        printf("Failed to load font: %s\n", mFontPath.c_str());
+        exit(-1);
+    }
+    else{
+        printf("[Root] Font loaded from %s\n", mFontPath.c_str());
+    }
 }
 
 bool Root::loadConfigFile()
@@ -32,6 +39,11 @@ bool Root::loadConfigFile()
     GetPrivateProfileString("General", "RootPath", "./", rootPath, BUFFER_SIZE, mConfigFileName.c_str());
     mRootPath.assign(rootPath);
     printf("[Root] RootPath = %s\n", mRootPath.c_str());
+
+    char fontPath[BUFFER_SIZE];
+    GetPrivateProfileString("General", "FontPath", "", fontPath, BUFFER_SIZE, mConfigFileName.c_str());
+    mFontPath.assign(fontPath);
+    printf("[Root] FontPath = %s\n", mFontPath.c_str());
 
     mNumOfScene = GetPrivateProfileInt("General", "NumOfScene", 0, mConfigFileName.c_str());
     printf("[Root] NumOfScene = %d\n", mNumOfScene);
@@ -47,6 +59,9 @@ bool Root::loadConfigFile()
 
     mEnableAirplane = GetPrivateProfileBool("General", "EnableAirplane", false, mConfigFileName.c_str());
     printf("[Root] EnableAirplane = %d\n", (int)mEnableAirplane);
+
+    mEnableMusic = GetPrivateProfileBool("General", "EnableMusic", false, mConfigFileName.c_str());
+    printf("[Root] EnableMusic = %d\n", (int)mEnableMusic);
 
     return true;
 };

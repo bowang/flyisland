@@ -63,6 +63,8 @@ void SoundManager::loadAssets()
 
 void SoundManager::play(SoundType type)
 {
+    if(!root->mEnableMusic) return;
+
     switch(type){
     case Background:
         BackgroundMusic.SetVolume(volumn);

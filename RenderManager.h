@@ -40,6 +40,7 @@ private:
     void renderSkyBox();
     void renderTriangles(Shader* shader);
     void renderBoundingBox(Shader* shader);
+    void renderText();
 
     GLuint tColorCubeMap;
     int renderPosition;

@@ -25,7 +25,7 @@ void RenderManager::initOpenGL()
 #endif
 
     glClearDepth(1.0f);
-    glClearColor(0.655f, 0.855f, 0.973f, 1.0f);
+    glClearColor(99.f/255.f, 122.f/255.f, 192.f/255.f, 1.0f);
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
     glViewport(0, 0, window.GetWidth(), window.GetHeight());
@@ -52,20 +52,22 @@ void RenderManager::renderFrame(int j)
     renderPosition = j;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+    
     // render skybox first
     renderSkyBox();
     
     // render objects (airplane, island, etc)
     renderObjects();
-
+    
     // render triangles for testing purpose
     // renderTriangles(shaders[3]);
     renderBoundingBox(shaders[3]);
-
+    
     // render particles here
     renderParticles(shaders[4]);
-
+    
+    // render text
+    renderText();
 }
 
 void RenderManager::renderObjects()
@@ -645,7 +647,6 @@ void RenderManager::renderParticles(Shader* shader){
 
     GL_CHECK(glEnable(GL_POINT_SPRITE))
     GL_CHECK(glEnable(GL_VERTEX_PROGRAM_POINT_SIZE))
-    GL_CHECK(glEnable(GL_BLEND))
     GL_CHECK(glDepthMask(GL_FALSE))
     GL_CHECK(glUseProgram(shader->programID()))
 
@@ -724,3 +725,29 @@ void RenderManager::renderBoundingBox(Shader* shader)
 
     GL_CHECK(glPopMatrix())
 }
+
+void RenderManager::renderText()
+{
+    // window.PreserveOpenGLStates(true);
+    GL_CHECK(glActiveTexture(GL_TEXTURE0))
+    GL_CHECK(glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE))
+    GL_CHECK(glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE))
+    GL_CHECK(glUseProgram(0))
+    //GL_CHECK(glDepthMask(GL_FALSE))
+    //GL_CHECK(glDisable(GL_DEPTH_TEST))
+
+    // score
+    char score[11];
+    sprintf(score, "%d", root->mPlayerScore);
+    sf::String scoreText(score, root->mFont, 60.f);
+    scoreText.SetColor(sf::Color(0,0,255));
+    scoreText.SetScale(1.f, 1.f);
+    scoreText.Move(950.f, 700.f);
+
+
+    window.Draw(scoreText);
+
+    //GL_CHECK(glEnable(GL_DEPTH_TEST))
+    //GL_CHECK(glDepthMask(GL_TRUE))
+}
+

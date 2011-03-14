@@ -29,15 +29,18 @@ public:
 
     string mConfigFileName;
     string mRootPath;
+    string mFontPath;
     int    mNumOfScene;
     int    mNumOfShaders;
     int    mNumOfLights;
     int    mNumOfParticles;
     bool   mEnableAirplane;
+    bool   mEnableMusic;
     bool   mHighSpeed;
     bool   mAirplaneCrash;
     bool   mDepthOfField;
-    int    mHitCount;
+    int    mPlayerScore;
+    sf::Font mFont;
 
     // Camera parameters
     aiVector3D eye;
