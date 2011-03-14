@@ -77,6 +77,8 @@ void Root::run()
     mSoundManager->loadAssets();
     mSoundManager->play(Background);
     mSoundManager->loop(Background, true);
+    mSoundManager->play(Sea);
+    mSoundManager->loop(Sea, true);
 
     mRenderManager->preprocess();
 

@@ -11,7 +11,8 @@ enum SoundType{
     Hit,
     Crash,
     Success,
-    Fail
+    Fail,
+    Sea
 };
 
 class SoundManager{
@@ -35,6 +36,7 @@ private:
     sf::Sound HitSound;
     sf::Sound CrashSound;
     sf::Music BackgroundMusic;
+    sf::Music SeaMusic;
 
 protected:
 

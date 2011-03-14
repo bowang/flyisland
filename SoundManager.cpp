@@ -57,6 +57,16 @@ void SoundManager::loadAssets()
     }
     CrashSound.SetBuffer(CrashBuffer);
 
+    // sea music
+    GetPrivateProfileString("Music", "Sea", "", fileName, BUFFER_SIZE, root->mConfigFileName.c_str());
+    strcpy(filePath, root->mRootPath.c_str());    strcat(filePath, fileName);
+    if(SeaMusic.OpenFromFile(filePath)){
+        printf("[SoundManager] Sea music opened: %s\n", filePath);
+    }
+    else{
+        printf("Failed to open sea music: %s\n", filePath);
+    }
+
 }
 
 
@@ -81,6 +91,10 @@ void SoundManager::play(SoundType type)
     case Crash:
         CrashSound.SetVolume(volumn);
         CrashSound.Play();
+        break;
+    case Sea:
+        SeaMusic.SetVolume(volumn*0.7);
+        SeaMusic.Play();
         break;
     default:
         break;
