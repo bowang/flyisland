@@ -55,7 +55,7 @@ void SceneManager::loadAssets()
     j = 0;
     if(root->mEnableAirplane) j = 1;
     for( ; j < root->mNumOfScene; j++){
-        if(mSceneNodes[j].target){
+        if(mSceneNodes[j].target==true && mSceneNodes[j].hit==false){
             genBoundingBox(j);
             printf("[SceneManager] bounding box built for scene[%d]\n", j);
         }
