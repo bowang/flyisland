@@ -472,7 +472,11 @@ void SceneManager::updateTargets()
                 }
                 if(strcmp(scene.name,"ship")==0){
                     // add update for ship here
-
+                    aiVector3D d = scene.mPosition - root->airplane->mPosition;
+                    float dl = d.Length();
+                    float dd = dl*dl;
+                    // if ship is too far away from the airplane, destroy it!
+                    if(dd > 80000.f) scene.hit = true;
                 }
                 scene.mPosition += scene.mVelocity;
             }
