@@ -81,51 +81,60 @@ void InputManager::handleInput()
                 break;
             case sf::Key::PageUp:
                 root->mWaveMagnitude += 0.0005f;
-				{
-					float amplitude = root->mRenderManager->oceanRender->wave_set.val_A();
-					amplitude += 0.0005f;
-					root->mRenderManager->oceanRender->wave_set.update_wind_speed(amplitude);
-				}
+                {
+                    float amplitude = root->mRenderManager->oceanRender->wave_set.val_A();
+                    amplitude += 0.0005f;
+                    root->mRenderManager->oceanRender->wave_set.update_wind_speed(amplitude);
+                }
                 break;
             case sf::Key::PageDown:
                 root->mWaveMagnitude -= 0.0005f;
-				{
-					float amplitude = root->mRenderManager->oceanRender->wave_set.val_A();
-					amplitude -= 0.0005f;
-					root->mRenderManager->oceanRender->wave_set.update_wind_speed(amplitude);
-				}
+                {
+                    float amplitude = root->mRenderManager->oceanRender->wave_set.val_A();
+                    amplitude -= 0.0005f;
+                    root->mRenderManager->oceanRender->wave_set.update_wind_speed(amplitude);
+                }
                 break;
             case sf::Key::I:
                 root->mWind.x -= 5.f;
-				{
-					vector2 wind = root->mRenderManager->oceanRender->wave_set.val_wind();
-					wind.x -= 0.1f;
-					root->mRenderManager->oceanRender->wave_set.update_wind_dir(wind);
-				}
+                {
+                    vector2 wind = root->mRenderManager->oceanRender->wave_set.val_wind();
+                    wind.x -= 0.1f;
+                    root->mRenderManager->oceanRender->wave_set.update_wind_dir(wind);
+                }
                 break;
             case sf::Key::K:
                 root->mWind.x += 5.f;
-				{
-					vector2 wind = root->mRenderManager->oceanRender->wave_set.val_wind();
-					wind.x += 0.1f;
-					root->mRenderManager->oceanRender->wave_set.update_wind_dir(wind);
-				}
+                {
+                    vector2 wind = root->mRenderManager->oceanRender->wave_set.val_wind();
+                    wind.x += 0.1f;
+                    root->mRenderManager->oceanRender->wave_set.update_wind_dir(wind);
+                }
                 break;
             case sf::Key::J:
                 root->mWind.z -= 5.f;
-				{
-					vector2 wind = root->mRenderManager->oceanRender->wave_set.val_wind();
-					wind.y -= 0.1f;
-					root->mRenderManager->oceanRender->wave_set.update_wind_dir(wind);
-				}
+                {
+                    vector2 wind = root->mRenderManager->oceanRender->wave_set.val_wind();
+                    wind.y -= 0.1f;
+                    root->mRenderManager->oceanRender->wave_set.update_wind_dir(wind);
+                }
                 break;
             case sf::Key::L:
                 root->mWind.z += 5.f;
-				{
-					vector2 wind = root->mRenderManager->oceanRender->wave_set.val_wind();
-					wind.y += 0.1f;
-					root->mRenderManager->oceanRender->wave_set.update_wind_dir(wind);
-				}
+                {
+                    vector2 wind = root->mRenderManager->oceanRender->wave_set.val_wind();
+                    wind.y += 0.1f;
+                    root->mRenderManager->oceanRender->wave_set.update_wind_dir(wind);
+                }
+                break;
+            case sf::Key::Return:
+                root->mAirplaneCrash = false;
+                root->mPlayerScore = 0;
+                root->mLevel = 1;
+                root->mMinute = 0;
+                root->mSecond = 0;
+                root->mSceneManager->initializeWorld();
+                root->airplane->loadParameters("Scene 0", root->mConfigFilename.c_str());
                 break;
             default:
                 break;
