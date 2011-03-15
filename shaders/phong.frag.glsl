@@ -19,28 +19,27 @@ varying vec3 eyePosition;
 
 void main() {
 
-    // Normalize the normal, and calculate light vector and view vector
-    // Note: this is doing a directional light, which is a little different
-    // from what you did in Assignment 2.
-    vec3 N = normalize(normal);
-    vec3 L = normalize(gl_LightSource[0].position.xyz);
-    vec3 V = normalize(-eyePosition);
+	// Normalize the normal, and calculate light vector and view vector
+	// Note: this is doing a directional light, which is a little different
+	// from what you did in Assignment 2.
+	vec3 N = normalize(normal);
+	vec3 L = normalize(gl_LightSource[0].position.xyz);
+	vec3 V = normalize(-eyePosition);
+		
+	// Calculate the diffuse color coefficient, and sample the diffuse texture
+	float Rd = max(0.0, dot(L, N));
+	vec3 Td = texture2D(diffuseMap, texcoord).rgb;
+	vec3 diffuse = Rd * Kd * Td * gl_LightSource[0].diffuse.rgb;
+	
+	// Calculate the specular coefficient
+	vec3 R = reflect(-L, N);
+	float Rs = pow(max(0.0, dot(V, R)), alpha);
+	vec3 Ts = texture2D(specularMap, texcoord).rgb;
+	vec3 specular = Rs * Ks * Ts * gl_LightSource[0].specular.rgb;
+		
+	// Ambient is easy
+	vec3 ambient = Ka * gl_LightSource[0].ambient.rgb;
 
-    // Calculate the diffuse color coefficient, and sample the diffuse texture
-    float Rd = max(0.0, dot(L, N));
-    vec3 Td = texture2D(diffuseMap, texcoord).rgb;
-    vec3 diffuse = Rd * Kd * Td * gl_LightSource[0].diffuse.rgb;
-
-    // Calculate the specular coefficient
-    vec3 R = reflect(-L, N);
-    float Rs = pow(max(0.0, dot(V, R)), alpha);
-    vec3 Ts = texture2D(specularMap, texcoord).rgb;
-    vec3 specular = Rs * Ks * gl_LightSource[0].specular.rgb;
-
-    // Ambient is easy
-    vec3 ambient = Ka * gl_LightSource[0].ambient.rgb;
-
-    // This actually writes to the frame buffer
-    gl_FragColor = vec4(diffuse + specular + ambient, 1);
-    // gl_FragColor = vec4(Td, 1);
+	// This actually writes to the frame buffer
+	gl_FragColor = vec4(diffuse + specular + ambient, 1);
 }
