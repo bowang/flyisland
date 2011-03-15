@@ -77,6 +77,24 @@ void InputManager::handleInput()
             case sf::Key::Numpad6:
                 root->light[2].position[2] += 5.f;
                 break;
+            case sf::Key::PageUp:
+                root->mWaveMagnitude += 0.05f;
+                break;
+            case sf::Key::PageDown:
+                root->mWaveMagnitude -= 0.05f;
+                break;
+            case sf::Key::I:
+                root->mWind.x -= 5.f;
+                break;
+            case sf::Key::K:
+                root->mWind.x += 5.f;
+                break;
+            case sf::Key::J:
+                root->mWind.z -= 5.f;
+                break;
+            case sf::Key::L:
+                root->mWind.z += 5.f;
+                break;
             default:
                 break;
             }

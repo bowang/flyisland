@@ -44,11 +44,10 @@ public:
     int    mMinute;
     int    mSecond;
     int    mLevel;
-    int    mNumOfTargets;
 
-    // ocean parameters
-    float      mWaveMagnitude;
-    aiVector3D mWind;
+    // Ocean parameters
+    float      mWaveMagnitude;  // initialized to 1
+    aiVector3D mWind;           // initialized to (0,0,1)
 
     // Camera parameters
     aiVector3D eye;

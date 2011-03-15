@@ -36,7 +36,6 @@ void SceneManager::loadAssets()
         }
 
         mSceneNodes[i].initialize(i, root->mConfigFilename.c_str());
-        if(mSceneNodes[i].target) root->mNumOfTargets++;
     }
     printf("\n");
 

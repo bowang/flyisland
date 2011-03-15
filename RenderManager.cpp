@@ -411,7 +411,7 @@ void RenderManager::setCamera() {
     gluLookAt(root->eye.x, root->eye.y, root->eye.z, 
               root->target.x, root->target.y, root->target.z, 
               root->up.x, root->up.y, root->up.z);
-
+/*
     GLfloat v[16];
     GL_CHECK(glGetFloatv(GL_MODELVIEW_MATRIX, v))
     aiMatrix4x4 vm(v[0],v[4],v[8],v[12],
@@ -423,6 +423,7 @@ void RenderManager::setCamera() {
     inverseView[1] = vm.b1; inverseView[5] = vm.b2; inverseView[9]  = vm.b3; inverseView[13] = vm.b4;
     inverseView[2] = vm.c1; inverseView[6] = vm.c2; inverseView[10] = vm.c3; inverseView[14] = vm.c4;
     inverseView[3] = vm.d1; inverseView[7] = vm.d2; inverseView[11] = vm.d3; inverseView[15] = vm.d4;
+*/
 }
 
 void RenderManager::setCameraDOF(float xoff, float yoff, float focus) {
@@ -468,7 +469,7 @@ void RenderManager::setCameraDOF(float xoff, float yoff, float focus) {
     gluLookAt(root->eye.x, root->eye.y, root->eye.z, 
               root->target.x, root->target.y, root->target.z, 
               root->up.x, root->up.y, root->up.z);
-
+/*
     GLfloat v[16];
     GL_CHECK(glGetFloatv(GL_MODELVIEW_MATRIX, v))
     aiMatrix4x4 vm(v[0],v[4],v[8],v[12],
@@ -480,7 +481,7 @@ void RenderManager::setCameraDOF(float xoff, float yoff, float focus) {
     inverseView[1] = vm.b1; inverseView[5] = vm.b2; inverseView[9]  = vm.b3; inverseView[13] = vm.b4;
     inverseView[2] = vm.c1; inverseView[6] = vm.c2; inverseView[10] = vm.c3; inverseView[14] = vm.c4;
     inverseView[3] = vm.d1; inverseView[7] = vm.d2; inverseView[11] = vm.d3; inverseView[15] = vm.d4;
-
+*/
     GLfloat vm_f[16];
     //----------------get model view matrix, get projection matrix -------------------
     glGetFloatv(GL_MODELVIEW_MATRIX, vm_f);

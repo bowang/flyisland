@@ -8,6 +8,7 @@ Root::Root()
 }
 
 Root::Root(string configFilename)
+    :mWind(0.f, 0.f, 1.f)
 {
     mConfigFilename = configFilename;
     loadConfigFile();
@@ -27,7 +28,7 @@ Root::Root(string configFilename)
     mMinute = 0;
     mSecond = 0;
     mLevel  = 1;
-    mNumOfTargets = 0;
+    mWaveMagnitude = 1.f;
     if(!mFont.LoadFromFile(mFontPath)){
         printf("Failed to load font: %s\n", mFontPath.c_str());
         exit(-1);
@@ -92,7 +93,7 @@ void Root::run()
 
         GL_CHECK(glClear(GL_ACCUM_BUFFER_BIT))
         int run = 1;
-        if(mHighSpeed) run = 5;
+        if(mHighSpeed) run = 3;
         for(int i = 0; i < run; i++){
             mSceneManager->updateWorld();
             if(mDepthOfField){
