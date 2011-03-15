@@ -17,7 +17,8 @@ public:
     void initOpenGL();
     void preprocess();
     void renderFrame(int j=0);
-
+    //---------need to be accessed in input manager
+    render_ocean_class* oceanRender;
 private:
     Root* root;
     vector<Shader*> shaders;
@@ -49,7 +50,7 @@ private:
 
     GLuint tColorCubeMap;
     int renderPosition;
-    render_ocean_class* oceanRender;
+    
     //------------- need aiMatrix4x4 pj_mv
     aiMatrix4x4 pj_mv;
 

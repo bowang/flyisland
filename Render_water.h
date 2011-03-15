@@ -24,6 +24,12 @@ public:
 	ocean_wave(int k_num_, float Lx_, float Ly_, float A_, float lambda_L_, vector2 & wind_dir_);
 	void cal_h_k_t(float elapsed);
 	int val_k_num();
+
+	//---------- add more controllability
+	float val_A();	//get lambda_L
+	vector2 val_wind();
+	void update_wind_speed(float wind_speed_);
+	void update_wind_dir(vector2 & wind_dir_);
 };
 
 class ocean_mesh{

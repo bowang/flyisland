@@ -54,6 +54,59 @@ int ocean_wave::val_k_num(){
     return k_num;
 }
 
+float ocean_wave::val_A(){
+    return this->A;
+}
+
+vector2 ocean_wave::val_wind(){
+    return vector2(this->wind_dir);
+}
+
+void ocean_wave::update_wind_speed(float A_){
+//	this->lambda_L = wind_speed_;	//lambda_L = wind_speed_^2/gravity, for simplicity do this
+    float pre_A = this->A;
+    float pre_A_sqrt = sqrt(pre_A);
+    this->A = A_;
+    float A_sqrt = sqrt(this->A);
+
+    float lambda_L_sqr = pow(lambda_L, 2);	//L^2
+
+    for(int i = 0; i < k_num; i++)
+        for(int j=0; j< k_num; j++){
+            h_k(i, j).re = h_k(i, j).re/pre_A_sqrt * A_sqrt;	h_k(i, j).im = h_k(i, j).im/pre_A_sqrt * A_sqrt;
+        }
+}
+
+void ocean_wave::update_wind_dir(vector2 & wind_dir_){
+    vector2 pre_wind_dir = this->wind_dir;
+    this->wind_dir = wind_dir_;
+    wind_dir.normalize();
+    float lambda_L_sqr = pow(lambda_L, 2);	//L^2
+    for(int i = 0; i < k_num; i++)
+        for(int j=0; j< k_num; j++){
+            //----------calculate P_k mesh
+            float cross_product_abs =  fabs(k(i, j)* wind_dir);
+            float pre_cross_product_abs = fabs(k(i, j)* pre_wind_dir);
+/*			if(pre_cross_product_abs > 0.0000001f){
+                h_k(i,j).re = h_k(i,j).re/pre_cross_product_abs*cross_product_abs;
+                h_k(i,j).im = h_k(i,j).re/pre_cross_product_abs*cross_product_abs;
+            }else*/
+            {	//only calculate points need to be calculated
+                float k_norm2 = k(i, j).norm2();
+                    if(k_norm2 < 0.000000001) k_norm2 = 0.000000001;
+                P_k(i, j)= A * exp(-1.0/(k_norm2 * lambda_L_sqr)) / pow(k_norm2, 3) * pow(cross_product_abs, 2)
+                    *exp(-k_norm2*pow(lambda_cutoff,2));
+                float P_k_sqrt = sqrt(P_k(i,j));	//squar root
+                // P_k = A exp(-1/(k*L)^2)/k^4 * (k_dir * w_dir)^2 = A exp(-1/(k*L)^2)/k^2 * (k * w_dir)^2
+                float eps_r = gaussrand();	float eps_i = gaussrand();
+                float h_k_Re = 1/sqrt(2.0) * eps_r * P_k_sqrt;
+                float h_k_Im = 1/sqrt(2.0) * eps_i * P_k_sqrt;		
+                //----------h_k_mesh
+                h_k(i, j).re = h_k_Re;	h_k(i, j).im = h_k_Im;
+            }
+        }
+}
+
 ocean_mesh::ocean_mesh(int N_, float Lx_, float Lz_)
     :N(N_), Lx(Lx_), Lz(Lz_), mesh(N_, N_), e_x_t(N_, N_), max_height(0.0)
 {	//generate mesh grid of the ocean

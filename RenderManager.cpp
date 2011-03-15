@@ -816,12 +816,14 @@ void RenderManager::renderOcean()
     this->setCameraDOF();
     GL_CHECK(glEnable(GL_DEPTH_TEST))
     GL_CHECK(glDepthMask(GL_TRUE))
+/*
     aiVector3D v = root->target - root->eye;
     float r_l_angle; 
     if(v.z>0)
         r_l_angle = atan(-v.x/v.z)/Pi*180.f;
     else
         r_l_angle = atan(-v.x/v.z)/Pi*180.f + 180.f;
+*/
 //    oceanRender->render_ocean(0.01f, vector3(root->eye.x, root->eye.y, root->eye.z), r_l_angle);
     oceanRender->render_ocean(0.1f, vector3(root->eye.x, root->eye.y, root->eye.z), this->pj_mv);
 }
