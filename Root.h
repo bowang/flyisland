@@ -39,6 +39,7 @@ public:
     bool   mHighSpeed;
     bool   mAirplaneCrash;
     bool   mDepthOfField;
+    bool   mSuccess;
     int    mPlayerScore;
     sf::Font mFont;
     int    mMinute;

@@ -18,6 +18,7 @@ void InputManager::handleInput()
 {
     sf::Event evt;
     while (window.GetEvent(evt)) {
+        int newLevel;
         switch (evt.Type) {
         case sf::Event::Closed: 
             window.Close(); 
@@ -65,7 +66,14 @@ void InputManager::handleInput()
                 break;
             case sf::Key::Add:
                 root->mPlayerScore += 50;
-                root->mLevel = root->mPlayerScore/50 + 1;
+                newLevel = root->mPlayerScore/50 + 1;
+                if(newLevel > root->mLevel){
+                    root->mLevel = newLevel;
+                    root->mSoundManager->play(Upgrade);
+                }
+                if(root->mLevel == 10){
+                    root->mSuccess = true;
+                }
                 break;
             case sf::Key::Numpad8:
                 root->light[2].position[0] -= 5.f;
@@ -129,6 +137,7 @@ void InputManager::handleInput()
                 break;
             case sf::Key::Return:
                 root->mAirplaneCrash = false;
+                root->mSuccess = false;
                 root->mPlayerScore = 0;
                 root->mLevel = 1;
                 root->mMinute = 0;

@@ -12,7 +12,8 @@ enum SoundType{
     Crash,
     Success,
     Fail,
-    Sea
+    Sea,
+    Upgrade
 };
 
 class SoundManager{
@@ -31,10 +32,12 @@ private:
     sf::SoundBuffer FireBuffer;
     sf::SoundBuffer HitBuffer;
     sf::SoundBuffer CrashBuffer;
+    sf::SoundBuffer UpgradeBuffer;
 
     sf::Sound FireSound;
     sf::Sound HitSound;
     sf::Sound CrashSound;
+    sf::Sound UpgradeSound;
     sf::Music BackgroundMusic;
     sf::Music SeaMusic;
 

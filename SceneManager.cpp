@@ -529,7 +529,14 @@ void SceneManager::hitTarget(int i)
         mSceneNodes[i].reappearClock.Reset();
         root->mSoundManager->play(Hit);
         root->mPlayerScore += mSceneNodes[i].score;
-        root->mLevel = root->mPlayerScore/50 + 1;
+        int newLevel = root->mPlayerScore/50 + 1;
+        if(newLevel > root->mLevel){
+            root->mLevel = newLevel;
+            root->mSoundManager->play(Upgrade);
+        }
+        if(root->mLevel == 10){
+            root->mSuccess = true;
+        }
         genFireParticle(mSceneNodes[i].mPosition);
     }
 }

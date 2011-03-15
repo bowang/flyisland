@@ -24,6 +24,7 @@ Root::Root(string configFilename)
     mHighSpeed = false;
     mAirplaneCrash = false;
     mDepthOfField = false;
+    mSuccess = false;
     mPlayerScore = 0;
     mMinute = 0;
     mSecond = 0;

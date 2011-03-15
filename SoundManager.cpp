@@ -67,6 +67,17 @@ void SoundManager::loadAssets()
         printf("Failed to open sea music: %s\n", filePath);
     }
 
+    // upgrade music
+    GetPrivateProfileString("Music", "Upgrade", "", fileName, BUFFER_SIZE, root->mConfigFilename.c_str());
+    strcpy(filePath, root->mRootPath.c_str());    strcat(filePath, fileName);
+    if(UpgradeBuffer.LoadFromFile(filePath)){
+        printf("[SoundManager] Upgrade sound loaded: %s\n", filePath);
+    }
+    else{
+        printf("Failed to load upgrade sound: %s\n", filePath);
+    }
+    UpgradeSound.SetBuffer(UpgradeBuffer);
+
 }
 
 
@@ -95,6 +106,10 @@ void SoundManager::play(SoundType type)
     case Sea:
         SeaMusic.SetVolume(volumn*1.5f);
         SeaMusic.Play();
+        break;
+    case Upgrade:
+        UpgradeSound.SetVolume(volumn);
+        UpgradeSound.Play();
         break;
     default:
         break;
