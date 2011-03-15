@@ -6,7 +6,7 @@
 #define WINDOW_WIDTH  1024
 #define WINDOW_HEIGHT 768
 #define Pi 3.1415926f
-#define EPSILON 0.00001
+#define EPSILON 0.00000000001f
 
 //#define DPRINT
 #ifdef DPRINT
@@ -17,7 +17,6 @@
 
 // #undef _DEBUG
 // #if _DEBUG
-
 // #define DEBUG
 #ifdef DEBUG
 #define GL_CHECK(x) {\

@@ -117,7 +117,7 @@ void SceneManager::genBoundingBox(int sceneIdx)
 void SceneManager::findBox(aiNode* node, const aiScene* scene)
 {
     modelMatrixStack.push(modelMatrix);
-    modelMatrix = node->mTransformation * modelMatrix;
+    modelMatrix = modelMatrix * node->mTransformation;
 
     for(unsigned i = 0; i < node->mNumMeshes; i++){
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
@@ -327,8 +327,10 @@ void SceneManager::updateAirplane()
     if(!root->mAirplaneCrash){
         root->airplane->mPosition += v;
         flyDirection += v;
-        if(root->airplane->mPosition.y < -0.5f)
+        if(root->airplane->mPosition.y < -0.5f){
             root->mAirplaneCrash = true;
+            // root->airplane->mPosition.y = 0.f;
+        }
 
         // rotate airscrew
         airscrewTopAngle += rotationSpeed/180.f*Pi;
@@ -370,8 +372,7 @@ void SceneManager::genTriangleVertices(SceneNode& scene){
 
     aiMatrix4x4 translate, rotate, scale;
     translate.Translation(scene.mPosition, translate);
-    //rotate.Rotation(scene.mRotateAngle/180.f*Pi, scene.mRotate, rotate);
-    rotate.Rotation(scene.mRotateAngle/180.f*Pi, aiVector3D(0.0f,0.0f,1.0f), rotate);
+    rotate.Rotation(scene.mRotateAngle/180.f*Pi, scene.mRotate, rotate);
     scale.Scaling(scene.mScale,scale);
     loadIdentity(modelMatrix);
     modelMatrix *= translate;
@@ -383,7 +384,7 @@ void SceneManager::genTriangleVertices(SceneNode& scene){
 void SceneManager::genTriangle(const aiScene* scene, aiNode* node){
 
     modelMatrixStack.push(modelMatrix);
-    modelMatrix = node->mTransformation * modelMatrix;
+    modelMatrix = modelMatrix * node->mTransformation;
 
     for(unsigned i = 0; i < node->mNumMeshes; i++){
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
