@@ -61,6 +61,8 @@ void InputManager::handleInput()
                 prevDepthOfField = root->mDepthOfField;
                 root->mDepthOfField = false;
                 break;
+            case sf::Key::Add:
+                root->mPlayerScore += 50;
             default:
                 break;
             }

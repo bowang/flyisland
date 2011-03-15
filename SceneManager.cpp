@@ -415,6 +415,13 @@ void SceneManager::genCannonParticle()
     v *= mParticleTypes[0].speed;
     CannonParticle ball(root->airplane->mPosition, v, root);
     mCannonParticles.push_back(ball);
+    for(int i = 1; i < root->mLevel; i++){
+        CannonParticle ball(root->airplane->mPosition, v, root);
+        ball.position.x += Random(2.f);
+        ball.position.y += Random(2.f);
+        ball.position.z += Random(2.f);
+        mCannonParticles.push_back(ball);
+    }
 }
 
 void SceneManager::genFireParticle(aiVector3D position)
