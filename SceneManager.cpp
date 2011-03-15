@@ -328,6 +328,8 @@ void SceneManager::updateAirplane()
     if(!root->mAirplaneCrash){
         root->airplane->mPosition += v;
         flyDirection += v;
+        if(root->airplane->mPosition.y < -0.5f)
+            root->mAirplaneCrash = true;
 
         // rotate airscrew
         airscrewTopAngle += rotationSpeed/180.f*Pi;
@@ -480,7 +482,7 @@ void SceneManager::updateTargets()
                     scene.mPosition = position;
                     aiVector3D distance = root->airplane->mPosition - position;
                     if(distance.Length() > EPSILON) distance.Normalize();
-                    scene.mVelocity = distance * flySpeed * (float)root->mLevel;
+                    scene.mVelocity = distance * flySpeed * min((float)root->mLevel, 10.f);
                     scene.mVelocity.x += Random(0.3f) * flySpeed;
                     scene.mVelocity.z += Random(0.3f) * flySpeed;
                     scene.mVelocity.y = 0.f;

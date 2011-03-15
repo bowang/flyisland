@@ -63,6 +63,7 @@ void InputManager::handleInput()
                 break;
             case sf::Key::Add:
                 root->mPlayerScore += 50;
+                root->mLevel = root->mPlayerScore/50 + 1;
             default:
                 break;
             }
