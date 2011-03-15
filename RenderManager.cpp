@@ -27,7 +27,7 @@ void RenderManager::initOpenGL()
 #endif
 
     glClearDepth(1.0f);
-    glClearColor(99.f/255.f, 122.f/255.f, 192.f/255.f, 1.0f);
+    glClearColor(0.f, 0.2f, 0.5f, 1.0f);
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
     glViewport(0, 0, window.GetWidth(), window.GetHeight());
@@ -481,21 +481,21 @@ void RenderManager::setCameraDOF(float xoff, float yoff, float focus) {
     inverseView[2] = vm.c1; inverseView[6] = vm.c2; inverseView[10] = vm.c3; inverseView[14] = vm.c4;
     inverseView[3] = vm.d1; inverseView[7] = vm.d2; inverseView[11] = vm.d3; inverseView[15] = vm.d4;
 
-	GLfloat vm_f[16];
-	//----------------get model view matrix, get projection matrix -------------------
-	glGetFloatv(GL_MODELVIEW_MATRIX, vm_f);
-	aiMatrix4x4 mv_matrix(vm_f[0], vm_f[4], vm_f[8], vm_f[12],
-					vm_f[1], vm_f[5], vm_f[9], vm_f[13],
-					vm_f[2], vm_f[6], vm_f[10], vm_f[14],
-					vm_f[3], vm_f[7], vm_f[11], vm_f[15]);
+    GLfloat vm_f[16];
+    //----------------get model view matrix, get projection matrix -------------------
+    glGetFloatv(GL_MODELVIEW_MATRIX, vm_f);
+    aiMatrix4x4 mv_matrix(vm_f[0], vm_f[4], vm_f[8], vm_f[12],
+                    vm_f[1], vm_f[5], vm_f[9], vm_f[13],
+                    vm_f[2], vm_f[6], vm_f[10], vm_f[14],
+                    vm_f[3], vm_f[7], vm_f[11], vm_f[15]);
 
-	glGetFloatv(GL_MODELVIEW_MATRIX, vm_f);
-	aiMatrix4x4 pj_matrix(vm_f[0], vm_f[4], vm_f[8], vm_f[12],
-					vm_f[1], vm_f[5], vm_f[9], vm_f[13],
-					vm_f[2], vm_f[6], vm_f[10], vm_f[14],
-					vm_f[3], vm_f[7], vm_f[11], vm_f[15]);
+    glGetFloatv(GL_MODELVIEW_MATRIX, vm_f);
+    aiMatrix4x4 pj_matrix(vm_f[0], vm_f[4], vm_f[8], vm_f[12],
+                    vm_f[1], vm_f[5], vm_f[9], vm_f[13],
+                    vm_f[2], vm_f[6], vm_f[10], vm_f[14],
+                    vm_f[3], vm_f[7], vm_f[11], vm_f[15]);
 
-	this->pj_mv = pj_matrix * mv_matrix;
+    this->pj_mv = pj_matrix * mv_matrix;
 }
 
 void RenderManager::setLight() {
@@ -813,7 +813,7 @@ void RenderManager::renderOcean()
     else
         r_l_angle = atan(-v.x/v.z)/Pi*180.f + 180.f;
 //    oceanRender->render_ocean(0.01f, vector3(root->eye.x, root->eye.y, root->eye.z), r_l_angle);
-	oceanRender->render_ocean(0.01f, vector3(root->eye.x, root->eye.y, root->eye.z), this->pj_mv);
+    oceanRender->render_ocean(0.1f, vector3(root->eye.x, root->eye.y, root->eye.z), this->pj_mv);
 }
 
 void RenderManager::initializeCamera()

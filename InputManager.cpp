@@ -38,13 +38,13 @@ void InputManager::handleInput()
                     printf("CameraMode: FreeView\n");
                 break;
             case sf::Key::Dash:
-                root->mSceneManager->flySpeed -= 0.004f;
+                root->mSceneManager->flySpeed -= 0.1f;
                 printf("Flying speed = %d\n", (int)(root->mSceneManager->flySpeed*1000.f));
                 dPitch -= 0.005f;
                 dYaw   -= 0.01f;
                 break;
             case sf::Key::Equal:
-                root->mSceneManager->flySpeed += 0.004f;
+                root->mSceneManager->flySpeed += 0.1f;
                 printf("Flying speed = %d\n", (int)(root->mSceneManager->flySpeed*1000.f));
                 dPitch += 0.005f;
                 dYaw   += 0.01f;

@@ -46,6 +46,10 @@ public:
     int    mLevel;
     int    mNumOfTargets;
 
+    // ocean parameters
+    float      mWave;
+    aiVector3D mWind;
+
     // Camera parameters
     aiVector3D eye;
     aiVector3D target;
