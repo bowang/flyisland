@@ -62,6 +62,8 @@
     <None Include="..\shaders\phong.vert.glsl" />
     <None Include="..\shaders\phong_color.frag.glsl" />
     <None Include="..\shaders\phong_color.vert.glsl" />
+    <None Include="..\shaders\phong_nospc.frag.glsl" />
+    <None Include="..\shaders\phong_nospc.vert.glsl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{DF5EFE84-6678-41AE-970C-1866E7408736}</ProjectGuid>

@@ -166,5 +166,11 @@
     <None Include="..\shaders\ocean.vert.glsl">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="..\shaders\phong_nospc.frag.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\shaders\phong_nospc.vert.glsl">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

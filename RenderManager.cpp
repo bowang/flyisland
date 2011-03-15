@@ -106,6 +106,14 @@ void RenderManager::renderObjects()
             break;
 
         default:
+            GL_CHECK(glUseProgram(shaders[shaderIdx]->programID()))
+            GL_CHECK(glViewport(0, 0, window.GetWidth(), window.GetHeight()))
+            GL_CHECK(setCameraDOF())
+            GL_CHECK(setLight())
+            for(unsigned i = 0; i < root->mSceneManager->mSceneNodes.size(); i++){
+                if(root->mSceneManager->mSceneNodes[i].hit==false)
+                    renderScene(root->mSceneManager->mSceneNodes[i], shaderIdx);
+            }
             break;
         }
     }
