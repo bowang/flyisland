@@ -64,6 +64,19 @@ void InputManager::handleInput()
             case sf::Key::Add:
                 root->mPlayerScore += 50;
                 root->mLevel = root->mPlayerScore/50 + 1;
+                break;
+            case sf::Key::Numpad8:
+                root->light[2].position[0] -= 5.f;
+                break;
+            case sf::Key::Numpad2:
+                root->light[2].position[0] += 5.f;
+                break;
+            case sf::Key::Numpad4:
+                root->light[2].position[2] -= 5.f;
+                break;
+            case sf::Key::Numpad6:
+                root->light[2].position[2] += 5.f;
+                break;
             default:
                 break;
             }

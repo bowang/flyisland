@@ -47,7 +47,7 @@ public:
     int    mNumOfTargets;
 
     // ocean parameters
-    float      mWave;
+    float      mWaveMagnitude;
     aiVector3D mWind;
 
     // Camera parameters
