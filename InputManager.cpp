@@ -6,9 +6,9 @@ extern sf::RenderWindow window;
 InputManager::InputManager(Root* root)
 {
     this->root = root;
-    delta  = GetPrivateProfileFloat("Input", "delta", 1.0f, root->mConfigFileName.c_str());
-    dPitch = GetPrivateProfileFloat("Input", "dPitch", 0.0f, root->mConfigFileName.c_str());
-    dYaw   = GetPrivateProfileFloat("Input", "dYaw", 0.0f, root->mConfigFileName.c_str());
+    delta  = GetPrivateProfileFloat("Input", "delta", 1.0f, root->mConfigFilename.c_str());
+    dPitch = GetPrivateProfileFloat("Input", "dPitch", 0.0f, root->mConfigFilename.c_str());
+    dYaw   = GetPrivateProfileFloat("Input", "dYaw", 0.0f, root->mConfigFilename.c_str());
     mouseCaptureEnabled = false;
 }
 
@@ -40,10 +40,14 @@ void InputManager::handleInput()
             case sf::Key::Dash:
                 root->mSceneManager->flySpeed -= 0.004f;
                 printf("Flying speed = %d\n", (int)(root->mSceneManager->flySpeed*1000.f));
+                dPitch -= 0.005f;
+                dYaw   -= 0.01f;
                 break;
             case sf::Key::Equal:
                 root->mSceneManager->flySpeed += 0.004f;
                 printf("Flying speed = %d\n", (int)(root->mSceneManager->flySpeed*1000.f));
+                dPitch += 0.005f;
+                dYaw   += 0.01f;
                 break;
             case sf::Key::Space:
                 root->mSceneManager->genCannonParticle();

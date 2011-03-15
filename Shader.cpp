@@ -115,17 +115,17 @@ bool Shader::loaded() const {
     return loaded_;
 }
 
-void Shader::initilize(const char* sceneName, const char* configFileName) {
+void Shader::initilize(const char* sceneName, const char* configFilename) {
 
-    usePosition  = GetPrivateProfileBool(sceneName, "usePosition", false, configFileName);
-    useAmbient   = GetPrivateProfileBool(sceneName, "useAmbient", false, configFileName);
-    useDiffuse   = GetPrivateProfileBool(sceneName, "useDiffuse", false, configFileName);
-    useSpecular  = GetPrivateProfileBool(sceneName, "useSpecular", false, configFileName);
-    useNormal    = GetPrivateProfileBool(sceneName, "useNormal", false, configFileName);
-    useTangent   = GetPrivateProfileBool(sceneName, "useTangent", false, configFileName);
-    useBitangent = GetPrivateProfileBool(sceneName, "useBitangent", false, configFileName);
-    useShadow    = GetPrivateProfileBool(sceneName, "useShadow", false, configFileName);
-    useCube      = GetPrivateProfileBool(sceneName, "useCube", false, configFileName);
+    usePosition  = GetPrivateProfileBool(sceneName, "usePosition", false, configFilename);
+    useAmbient   = GetPrivateProfileBool(sceneName, "useAmbient", false, configFilename);
+    useDiffuse   = GetPrivateProfileBool(sceneName, "useDiffuse", false, configFilename);
+    useSpecular  = GetPrivateProfileBool(sceneName, "useSpecular", false, configFilename);
+    useNormal    = GetPrivateProfileBool(sceneName, "useNormal", false, configFilename);
+    useTangent   = GetPrivateProfileBool(sceneName, "useTangent", false, configFilename);
+    useBitangent = GetPrivateProfileBool(sceneName, "useBitangent", false, configFilename);
+    useShadow    = GetPrivateProfileBool(sceneName, "useShadow", false, configFilename);
+    useCube      = GetPrivateProfileBool(sceneName, "useCube", false, configFilename);
 
 }
 

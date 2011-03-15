@@ -29,10 +29,11 @@ public:
     bool target;
     bool hit;
     int  score;
+    char name[BUFFER_SIZE];
     sf::Clock reappearClock;
 
     bool ReadFile(const std::string &pFile, unsigned int pFlags);
-    void initialize(int i, const char* configFileName);
+    void initialize(int i, const char* configFilename);
     int  numShaders();
     bool useShader(int i);
     void rotate(float angle);
@@ -46,7 +47,7 @@ private:
 
     void buildIndexBuffer();
     void loadTextures();
-    void loadParameters(const char* sceneName, const char* configFileName);
+    void loadParameters(const char* sceneName, const char* configFilename);
 
 protected:
 

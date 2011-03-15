@@ -7,6 +7,7 @@ extern sf::RenderWindow window;
 RenderManager::RenderManager(Root* root)
 {
     this->root = root;
+    oceanRender = new render_ocean_class(129, 20.f, 20.f, 0.002f, 1.f, vector2(1.f, 0.f));
     // depthBuffer = new DepthRenderTarget(window.GetWidth(), window.GetHeight());
 }
 
@@ -46,6 +47,8 @@ void RenderManager::initOpenGL()
 void RenderManager::preprocess()
 {
     // renderCubeFaces(root->mSceneManager->mSceneNodes[0]);
+    oceanRender->initial_ocean_shader();
+    initializeCamera();
 }
 
 void RenderManager::renderFrame(int j) 
@@ -58,17 +61,7 @@ void RenderManager::renderFrame(int j)
     renderSkyBox();
 
     // render ocean
-    this->setCameraDOF();
-    GL_CHECK(glEnable(GL_DEPTH_TEST))
-    GL_CHECK(glDepthMask(GL_TRUE))
-    float r_l_angle; 
-    aiVector3D v = root->target - root->eye;
-    if(v.z>0)
-        r_l_angle = atan(-v.x/v.z)/Pi*180.0;
-    else
-        r_l_angle = atan(-v.x/v.z)/Pi*180.0 + 180.0;
-
-    root->a_ocean_render->render_ocean(0.01, vector3(root->eye.x, root->eye.y, root->eye.z), r_l_angle);
+    renderOcean();
     
     // render objects (airplane, island, etc)
     renderObjects();
@@ -381,7 +374,7 @@ void RenderManager::loadShaders()
         char relativePath[BUFFER_SIZE];
         char shaderName[18];
         sprintf(shaderName, "Shader %d", i);
-        GetPrivateProfileString(shaderName, "FileName", "", relativePath, BUFFER_SIZE, root->mConfigFileName.c_str());
+        GetPrivateProfileString(shaderName, "FileName", "", relativePath, BUFFER_SIZE, root->mConfigFilename.c_str());
         strcpy(shaderPath, root->mRootPath.c_str());
         strcat(shaderPath, relativePath);
         shaders[i] = new Shader(shaderPath);
@@ -391,7 +384,7 @@ void RenderManager::loadShaders()
             exit(-1);
         }
         printf("[RenderManager] shader %d loaded\n", i);
-        shaders[i]->initilize(shaderName, root->mConfigFileName.c_str());
+        shaders[i]->initilize(shaderName, root->mConfigFilename.c_str());
     }
 }
 
@@ -782,5 +775,31 @@ void RenderManager::renderText()
 
     //GL_CHECK(glEnable(GL_DEPTH_TEST))
     //GL_CHECK(glDepthMask(GL_TRUE))
+}
+
+void RenderManager::renderOcean()
+{
+    this->setCameraDOF();
+    GL_CHECK(glEnable(GL_DEPTH_TEST))
+    GL_CHECK(glDepthMask(GL_TRUE))
+    aiVector3D v = root->target - root->eye;
+    float r_l_angle; 
+    if(v.z>0)
+        r_l_angle = atan(-v.x/v.z)/Pi*180.f;
+    else
+        r_l_angle = atan(-v.x/v.z)/Pi*180.f + 180.f;
+    oceanRender->render_ocean(0.01f, vector3(root->eye.x, root->eye.y, root->eye.z), r_l_angle);
+}
+
+void RenderManager::initializeCamera()
+{
+    aiVector3D v = root->target - root->eye;
+    float lenxz = sqrt(v.x*v.x+v.z*v.z);
+    float lenxy = sqrt(v.x*v.x+v.y*v.y);
+    float yaw = asin(v.z/lenxz);
+    float pitch = - asin(v.y/lenxy);
+    root->eye.x = root->target.x - fabs(v.x)/v.x*lenxz*cos(yaw);
+    root->eye.y = root->target.y + lenxy*sin(pitch);
+    root->eye.z = root->target.z - lenxz*sin(yaw);
 }
 

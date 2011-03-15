@@ -52,7 +52,7 @@ public:
      */
     const std::string& errors() const;
 
-    void initilize(const char* sceneName, const char* configFileName);
+    void initilize(const char* sceneName, const char* configFilename);
 
     bool usePosition;
     bool useAmbient;

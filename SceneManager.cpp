@@ -17,7 +17,7 @@ void SceneManager::loadAssets()
         char modelName[BUFFER_SIZE];
         char sceneName[17];
         sprintf(sceneName, "Scene %d", i);
-        GetPrivateProfileString(sceneName, "FileName", "", modelName, BUFFER_SIZE, root->mConfigFileName.c_str());
+        GetPrivateProfileString(sceneName, "FileName", "", modelName, BUFFER_SIZE, root->mConfigFilename.c_str());
         char modelPath[2*BUFFER_SIZE];
         strcpy(modelPath, root->mRootPath.c_str());
         strcat(modelPath, modelName);
@@ -35,7 +35,7 @@ void SceneManager::loadAssets()
             exit(-1);
         }
 
-        mSceneNodes[i].initialize(i, root->mConfigFileName.c_str());
+        mSceneNodes[i].initialize(i, root->mConfigFilename.c_str());
         if(mSceneNodes[i].target) root->mNumOfTargets++;
     }
     printf("\n");
@@ -66,7 +66,7 @@ void SceneManager::loadAssets()
     for(int i = 0; i < 5; i++){
         char fileName[BUFFER_SIZE];
         char skyPath[2*BUFFER_SIZE];
-        GetPrivateProfileString("Sky", skyName[i], "", fileName, BUFFER_SIZE, root->mConfigFileName.c_str());
+        GetPrivateProfileString("Sky", skyName[i], "", fileName, BUFFER_SIZE, root->mConfigFilename.c_str());
         strcpy(skyPath, root->mRootPath.c_str());    strcat(skyPath, fileName);
         bool success = mSkybox[i].LoadFromFile(skyPath);
         if(!success){
@@ -83,7 +83,7 @@ void SceneManager::loadAssets()
         char particleName[BUFFER_SIZE];
         char particlePath[2*BUFFER_SIZE];
         sprintf(particleName, "Particle %d", i);
-        GetPrivateProfileString(particleName, "FileName", "", fileName, BUFFER_SIZE, root->mConfigFileName.c_str());
+        GetPrivateProfileString(particleName, "FileName", "", fileName, BUFFER_SIZE, root->mConfigFilename.c_str());
         strcpy(particlePath, root->mRootPath.c_str());    strcat(particlePath, fileName);
         bool success = mParticleTypes[i].LoadFromFile(particlePath);
         if(success){
@@ -92,13 +92,10 @@ void SceneManager::loadAssets()
         else{
             printf("Failed to load particle[%d]\n", i);
         }
-        mParticleTypes[i].speed = GetPrivateProfileFloat(particleName, "speed", 2.0f, root->mConfigFileName.c_str());
-        mParticleTypes[i].size  = GetPrivateProfileFloat(particleName, "size", 1.0f, root->mConfigFileName.c_str());
+        mParticleTypes[i].speed = GetPrivateProfileFloat(particleName, "speed", 2.0f, root->mConfigFilename.c_str());
+        mParticleTypes[i].size  = GetPrivateProfileFloat(particleName, "size", 1.0f, root->mConfigFilename.c_str());
 
     }
-
-    // load ocean shader
-    root->a_ocean_render->initial_ocean_shader();
 }
 
 void SceneManager::genBoundingBox(int sceneIdx)
@@ -193,48 +190,48 @@ void SceneManager::buildBoundingBoxBuffer()
 
 void SceneManager::initializeWorld()
 {
-    root->eye.x = GetPrivateProfileFloat("Initialization", "eyeX", 0.0f, root->mConfigFileName.c_str());
-    root->eye.y = GetPrivateProfileFloat("Initialization", "eyeY", 0.0f, root->mConfigFileName.c_str());
-    root->eye.z = GetPrivateProfileFloat("Initialization", "eyeZ", 0.0f, root->mConfigFileName.c_str());
-    root->target.x = GetPrivateProfileFloat("Initialization", "targetX", -1.0f, root->mConfigFileName.c_str());
-    root->target.y = GetPrivateProfileFloat("Initialization", "targetY", 0.0f, root->mConfigFileName.c_str());
-    root->target.z = GetPrivateProfileFloat("Initialization", "targetZ", 0.0f, root->mConfigFileName.c_str());
-    root->up.x = GetPrivateProfileFloat("Initialization", "upX", 0.0f, root->mConfigFileName.c_str());
-    root->up.y = GetPrivateProfileFloat("Initialization", "upY", 1.0f, root->mConfigFileName.c_str());
-    root->up.z = GetPrivateProfileFloat("Initialization", "upZ", 0.0f, root->mConfigFileName.c_str());
+    root->eye.x = GetPrivateProfileFloat("Initialization", "eyeX", 0.0f, root->mConfigFilename.c_str());
+    root->eye.y = GetPrivateProfileFloat("Initialization", "eyeY", 0.0f, root->mConfigFilename.c_str());
+    root->eye.z = GetPrivateProfileFloat("Initialization", "eyeZ", 0.0f, root->mConfigFilename.c_str());
+    root->target.x = GetPrivateProfileFloat("Initialization", "targetX", -1.0f, root->mConfigFilename.c_str());
+    root->target.y = GetPrivateProfileFloat("Initialization", "targetY", 0.0f, root->mConfigFilename.c_str());
+    root->target.z = GetPrivateProfileFloat("Initialization", "targetZ", 0.0f, root->mConfigFilename.c_str());
+    root->up.x = GetPrivateProfileFloat("Initialization", "upX", 0.0f, root->mConfigFilename.c_str());
+    root->up.y = GetPrivateProfileFloat("Initialization", "upY", 1.0f, root->mConfigFilename.c_str());
+    root->up.z = GetPrivateProfileFloat("Initialization", "upZ", 0.0f, root->mConfigFilename.c_str());
 
     if(root->mEnableAirplane){
         root->airplane = &(mSceneNodes[0]);
-        flyDirection.x = GetPrivateProfileFloat("Initialization", "flyDirectionX", 1.0f, root->mConfigFileName.c_str());
-        flyDirection.y = GetPrivateProfileFloat("Initialization", "flyDirectionY", 0.0f, root->mConfigFileName.c_str());
-        flyDirection.z = GetPrivateProfileFloat("Initialization", "flyDirectionZ", 0.0f, root->mConfigFileName.c_str());
+        flyDirection.x = GetPrivateProfileFloat("Initialization", "flyDirectionX", 1.0f, root->mConfigFilename.c_str());
+        flyDirection.y = GetPrivateProfileFloat("Initialization", "flyDirectionY", 0.0f, root->mConfigFilename.c_str());
+        flyDirection.z = GetPrivateProfileFloat("Initialization", "flyDirectionZ", 0.0f, root->mConfigFilename.c_str());
         flyDirection.x += root->airplane->mPosition.x;
         flyDirection.y += root->airplane->mPosition.y;
         flyDirection.z += root->airplane->mPosition.z;
-        flySpeed      = GetPrivateProfileFloat("Initialization", "flySpeed", 1.0f, root->mConfigFileName.c_str());
-        rotationSpeed = GetPrivateProfileFloat("Initialization", "rotationSpeed", 11.0f, root->mConfigFileName.c_str());
+        flySpeed      = GetPrivateProfileFloat("Initialization", "flySpeed", 1.0f, root->mConfigFilename.c_str());
+        rotationSpeed = GetPrivateProfileFloat("Initialization", "rotationSpeed", 11.0f, root->mConfigFilename.c_str());
     }
 
     for(int i = 0; i < root->mNumOfLights; i++){
         Light l;
         char lightName[17];
         sprintf(lightName, "Light %d", i);
-        l.position[0] = GetPrivateProfileFloat(lightName, "x", 0.0f, root->mConfigFileName.c_str());
-        l.position[1] = GetPrivateProfileFloat(lightName, "y", 1.0f, root->mConfigFileName.c_str());
-        l.position[2] = GetPrivateProfileFloat(lightName, "z", 0.0f, root->mConfigFileName.c_str());
-        l.position[3] = GetPrivateProfileFloat(lightName, "w", 0.0f, root->mConfigFileName.c_str());
-        l.ambient[0] = GetPrivateProfileFloat(lightName, "ambientR", 0.1f, root->mConfigFileName.c_str());
-        l.ambient[1] = GetPrivateProfileFloat(lightName, "ambientG", 0.1f, root->mConfigFileName.c_str());
-        l.ambient[2] = GetPrivateProfileFloat(lightName, "ambientB", 0.1f, root->mConfigFileName.c_str());
-        l.ambient[3] = GetPrivateProfileFloat(lightName, "ambientA", 1.0f, root->mConfigFileName.c_str());
-        l.diffuse[0] = GetPrivateProfileFloat(lightName, "diffuseR", 0.3f, root->mConfigFileName.c_str());
-        l.diffuse[1] = GetPrivateProfileFloat(lightName, "diffuseG", 0.3f, root->mConfigFileName.c_str());
-        l.diffuse[2] = GetPrivateProfileFloat(lightName, "diffuseB", 0.3f, root->mConfigFileName.c_str());
-        l.diffuse[3] = GetPrivateProfileFloat(lightName, "diffuseA", 1.0f, root->mConfigFileName.c_str());
-        l.specular[0] = GetPrivateProfileFloat(lightName, "specularR", 0.2f, root->mConfigFileName.c_str());
-        l.specular[1] = GetPrivateProfileFloat(lightName, "specularG", 0.2f, root->mConfigFileName.c_str());
-        l.specular[2] = GetPrivateProfileFloat(lightName, "specularB", 0.2f, root->mConfigFileName.c_str());
-        l.specular[3] = GetPrivateProfileFloat(lightName, "specularA", 1.0f, root->mConfigFileName.c_str());
+        l.position[0] = GetPrivateProfileFloat(lightName, "x", 0.0f, root->mConfigFilename.c_str());
+        l.position[1] = GetPrivateProfileFloat(lightName, "y", 1.0f, root->mConfigFilename.c_str());
+        l.position[2] = GetPrivateProfileFloat(lightName, "z", 0.0f, root->mConfigFilename.c_str());
+        l.position[3] = GetPrivateProfileFloat(lightName, "w", 0.0f, root->mConfigFilename.c_str());
+        l.ambient[0] = GetPrivateProfileFloat(lightName, "ambientR", 0.1f, root->mConfigFilename.c_str());
+        l.ambient[1] = GetPrivateProfileFloat(lightName, "ambientG", 0.1f, root->mConfigFilename.c_str());
+        l.ambient[2] = GetPrivateProfileFloat(lightName, "ambientB", 0.1f, root->mConfigFilename.c_str());
+        l.ambient[3] = GetPrivateProfileFloat(lightName, "ambientA", 1.0f, root->mConfigFilename.c_str());
+        l.diffuse[0] = GetPrivateProfileFloat(lightName, "diffuseR", 0.3f, root->mConfigFilename.c_str());
+        l.diffuse[1] = GetPrivateProfileFloat(lightName, "diffuseG", 0.3f, root->mConfigFilename.c_str());
+        l.diffuse[2] = GetPrivateProfileFloat(lightName, "diffuseB", 0.3f, root->mConfigFilename.c_str());
+        l.diffuse[3] = GetPrivateProfileFloat(lightName, "diffuseA", 1.0f, root->mConfigFilename.c_str());
+        l.specular[0] = GetPrivateProfileFloat(lightName, "specularR", 0.2f, root->mConfigFilename.c_str());
+        l.specular[1] = GetPrivateProfileFloat(lightName, "specularG", 0.2f, root->mConfigFilename.c_str());
+        l.specular[2] = GetPrivateProfileFloat(lightName, "specularB", 0.2f, root->mConfigFilename.c_str());
+        l.specular[3] = GetPrivateProfileFloat(lightName, "specularA", 1.0f, root->mConfigFilename.c_str());
         root->light.push_back(l);
     }
 
@@ -457,17 +454,28 @@ void SceneManager::updateTargets()
                 scene.reappearClock.Reset();
             }
             else if(scene.reappearClock.GetElapsedTime() > 10.f){
-                scene.hit = false;
-                aiVector3D position;
-                position.x = Random(70.f);
-                position.y = (float)fabs(Random(15.f))+10.f;
-                position.z = Random(70.f);
-                scene.mPosition = position;
-                if(position.Length() > EPSILON) position.Normalize();
-                scene.mVelocity = -position * root->mSceneManager->flySpeed * root->mLevel;
-                scene.mVelocity.x += Random(0.3f)*root->mSceneManager->flySpeed;
-                scene.mVelocity.z += Random(0.3f)*root->mSceneManager->flySpeed;
-                scene.mVelocity.y = 0.f;
+                if(strcmp(scene.name,"balloon")==0){
+                    scene.hit = false;
+                    aiVector3D position;
+                    position.x = Random(70.f);
+                    position.y = (float)fabs(Random(15.f))+10.f;
+                    position.z = Random(70.f);
+                    scene.mPosition = position;
+                    if(position.Length() > EPSILON) position.Normalize();
+                    scene.mVelocity = -position * root->mSceneManager->flySpeed * root->mLevel;
+                    scene.mVelocity.x += Random(0.3f)*root->mSceneManager->flySpeed;
+                    scene.mVelocity.z += Random(0.3f)*root->mSceneManager->flySpeed;
+                    scene.mVelocity.y = 0.f;
+                }
+                if(strcmp(scene.name,"ship")==0){
+                    scene.hit = false;
+                    scene.mPosition.x = 0.f;
+                    scene.mPosition.y = 0.f;
+                    scene.mPosition.z = -50.f;
+                    scene.mVelocity.x = 0.f;
+                    scene.mVelocity.y = 0.f;
+                    scene.mVelocity.z = root->mSceneManager->flySpeed;
+                }
             }
         }
     }

@@ -7,12 +7,11 @@ Root::Root()
     Root("./");
 }
 
-Root::Root(string configFileName)
+Root::Root(string configFilename)
 {
-    mConfigFileName = configFileName;
+    mConfigFilename = configFilename;
     loadConfigFile();
 
-    a_ocean_render = new render_ocean_class(129, 20.0, 20.0, 0.002, 1.0, vector2(1.0, 0.0));
     mSceneManager  = new SceneManager(this);
     mRenderManager = new RenderManager(this);
     mInputManager  = new InputManager(this);
@@ -41,31 +40,31 @@ Root::Root(string configFileName)
 bool Root::loadConfigFile()
 {
     char rootPath[BUFFER_SIZE];
-    GetPrivateProfileString("General", "RootPath", "./", rootPath, BUFFER_SIZE, mConfigFileName.c_str());
+    GetPrivateProfileString("General", "RootPath", "./", rootPath, BUFFER_SIZE, mConfigFilename.c_str());
     mRootPath.assign(rootPath);
     printf("[Root] RootPath = %s\n", mRootPath.c_str());
 
     char fontPath[BUFFER_SIZE];
-    GetPrivateProfileString("General", "FontPath", "", fontPath, BUFFER_SIZE, mConfigFileName.c_str());
+    GetPrivateProfileString("General", "FontPath", "", fontPath, BUFFER_SIZE, mConfigFilename.c_str());
     mFontPath.assign(fontPath);
     printf("[Root] FontPath = %s\n", mFontPath.c_str());
 
-    mNumOfScene = GetPrivateProfileInt("General", "NumOfScene", 0, mConfigFileName.c_str());
+    mNumOfScene = GetPrivateProfileInt("General", "NumOfScene", 0, mConfigFilename.c_str());
     printf("[Root] NumOfScene = %d\n", mNumOfScene);
 
-    mNumOfShaders = GetPrivateProfileInt("General", "NumOfShaders", 0, mConfigFileName.c_str());
+    mNumOfShaders = GetPrivateProfileInt("General", "NumOfShaders", 0, mConfigFilename.c_str());
     printf("[Root] NumOfShaders = %d\n", mNumOfShaders);
 
-    mNumOfLights = GetPrivateProfileInt("General", "NumOfLights", 0, mConfigFileName.c_str());
+    mNumOfLights = GetPrivateProfileInt("General", "NumOfLights", 0, mConfigFilename.c_str());
     printf("[Root] NumOfLights = %d\n", mNumOfLights);
 
-    mNumOfParticles = GetPrivateProfileInt("General", "NumOfParticles", 0, mConfigFileName.c_str());
+    mNumOfParticles = GetPrivateProfileInt("General", "NumOfParticles", 0, mConfigFilename.c_str());
     printf("[Root] NumOfParticles = %d\n", mNumOfParticles);
 
-    mEnableAirplane = GetPrivateProfileBool("General", "EnableAirplane", false, mConfigFileName.c_str());
+    mEnableAirplane = GetPrivateProfileBool("General", "EnableAirplane", false, mConfigFilename.c_str());
     printf("[Root] EnableAirplane = %d\n", (int)mEnableAirplane);
 
-    mEnableMusic = GetPrivateProfileBool("General", "EnableMusic", false, mConfigFileName.c_str());
+    mEnableMusic = GetPrivateProfileBool("General", "EnableMusic", false, mConfigFilename.c_str());
     printf("[Root] EnableMusic = %d\n", (int)mEnableMusic);
 
     return true;
@@ -93,7 +92,7 @@ void Root::run()
 
         GL_CHECK(glClear(GL_ACCUM_BUFFER_BIT))
         int run = 1;
-        if(mHighSpeed) run = 10;
+        if(mHighSpeed) run = 5;
         for(int i = 0; i < run; i++){
             mSceneManager->updateWorld();
             if(mDepthOfField){

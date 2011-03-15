@@ -60,28 +60,28 @@ void SceneNode::loadTextures()
     delete[] prefix;
 }
 
-void SceneNode::loadParameters(const char* sceneName, const char* configFileName)
+void SceneNode::loadParameters(const char* sceneName, const char* configFilename)
 {
-    mPosition.x = GetPrivateProfileFloat(sceneName, "x", 0.0f, configFileName);
-    mPosition.y = GetPrivateProfileFloat(sceneName, "y", 0.0f, configFileName);
-    mPosition.z = GetPrivateProfileFloat(sceneName, "z", 0.0f, configFileName);
+    mPosition.x = GetPrivateProfileFloat(sceneName, "x", 0.0f, configFilename);
+    mPosition.y = GetPrivateProfileFloat(sceneName, "y", 0.0f, configFilename);
+    mPosition.z = GetPrivateProfileFloat(sceneName, "z", 0.0f, configFilename);
 
-    mRotate.x = GetPrivateProfileFloat(sceneName, "rotateX", 0.0f, configFileName);
-    mRotate.y = GetPrivateProfileFloat(sceneName, "rotateY", 0.0f, configFileName);
-    mRotate.z = GetPrivateProfileFloat(sceneName, "rotateZ", 0.0f, configFileName);
-    mRotateAngle = GetPrivateProfileFloat(sceneName, "rotateA", 0.0f, configFileName);
+    mRotate.x = GetPrivateProfileFloat(sceneName, "rotateX", 0.0f, configFilename);
+    mRotate.y = GetPrivateProfileFloat(sceneName, "rotateY", 0.0f, configFilename);
+    mRotate.z = GetPrivateProfileFloat(sceneName, "rotateZ", 0.0f, configFilename);
+    mRotateAngle = GetPrivateProfileFloat(sceneName, "rotateA", 0.0f, configFilename);
 
-    mScale.x = GetPrivateProfileFloat(sceneName, "scaleX", 1.0f, configFileName);
-    mScale.y = GetPrivateProfileFloat(sceneName, "scaleY", 1.0f, configFileName);
-    mScale.z = GetPrivateProfileFloat(sceneName, "scaleZ", 1.0f, configFileName);
+    mScale.x = GetPrivateProfileFloat(sceneName, "scaleX", 1.0f, configFilename);
+    mScale.y = GetPrivateProfileFloat(sceneName, "scaleY", 1.0f, configFilename);
+    mScale.z = GetPrivateProfileFloat(sceneName, "scaleZ", 1.0f, configFilename);
 
-    mVelocity.x = GetPrivateProfileFloat(sceneName, "speedX", 0.0f, configFileName);
-    mVelocity.y = GetPrivateProfileFloat(sceneName, "speedY", 0.0f, configFileName);
-    mVelocity.z = GetPrivateProfileFloat(sceneName, "speedZ", 0.0f, configFileName);
+    mVelocity.x = GetPrivateProfileFloat(sceneName, "speedX", 0.0f, configFilename);
+    mVelocity.y = GetPrivateProfileFloat(sceneName, "speedY", 0.0f, configFilename);
+    mVelocity.z = GetPrivateProfileFloat(sceneName, "speedZ", 0.0f, configFilename);
 
     mShaderList.clear();
     char shaderList[BUFFER_SIZE];
-    GetPrivateProfileString(sceneName, "shader", "0", shaderList, sizeof(shaderList), configFileName);
+    GetPrivateProfileString(sceneName, "shader", "0", shaderList, sizeof(shaderList), configFilename);
     istringstream iss(shaderList);
     printf("[SceneNode] %s uses shaders: ", sceneName);
     while(!iss.eof()){
@@ -92,9 +92,10 @@ void SceneNode::loadParameters(const char* sceneName, const char* configFileName
     }
     printf("\n");
 
-    fixed  = GetPrivateProfileBool(sceneName, "fixed", false, configFileName);
-    target = GetPrivateProfileBool(sceneName, "target", false, configFileName);
-    score  = GetPrivateProfileInt(sceneName, "score", 0, configFileName);
+    fixed  = GetPrivateProfileBool(sceneName, "fixed", false, configFilename);
+    target = GetPrivateProfileBool(sceneName, "target", false, configFilename);
+    score  = GetPrivateProfileInt(sceneName, "score", 0, configFilename);
+    GetPrivateProfileString(sceneName, "name", "", name, BUFFER_SIZE, configFilename);
 }
 
 void SceneNode::buildIndexBuffer()
@@ -121,14 +122,14 @@ void SceneNode::buildIndexBuffer()
     printf("[SceneNode] Index buffers built: %s (%d meshes)\n", mSceneName.c_str(), mIndexBuffer.size());
 }
 
-void SceneNode::initialize(int i, const char* configFileName)
+void SceneNode::initialize(int i, const char* configFilename)
 {
     index = i;
     buildIndexBuffer();
     loadTextures();
     char sceneName[17];
     sprintf(sceneName, "Scene %d", i);
-    loadParameters(sceneName, configFileName);
+    loadParameters(sceneName, configFilename);
 }
 
 int SceneNode::numShaders()

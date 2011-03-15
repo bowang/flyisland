@@ -15,7 +15,7 @@ void SoundManager::loadAssets()
     char filePath[2*BUFFER_SIZE];
 
     // background music
-    GetPrivateProfileString("Music", "Background", "", fileName, BUFFER_SIZE, root->mConfigFileName.c_str());
+    GetPrivateProfileString("Music", "Background", "", fileName, BUFFER_SIZE, root->mConfigFilename.c_str());
     strcpy(filePath, root->mRootPath.c_str());    strcat(filePath, fileName);
     if(BackgroundMusic.OpenFromFile(filePath)){
         printf("[SoundManager] Background music opened: %s\n", filePath);
@@ -25,7 +25,7 @@ void SoundManager::loadAssets()
     }
 
     // fire music
-    GetPrivateProfileString("Music", "Fire", "", fileName, BUFFER_SIZE, root->mConfigFileName.c_str());
+    GetPrivateProfileString("Music", "Fire", "", fileName, BUFFER_SIZE, root->mConfigFilename.c_str());
     strcpy(filePath, root->mRootPath.c_str());    strcat(filePath, fileName);
     if(FireBuffer.LoadFromFile(filePath)){
         printf("[SoundManager] Fire sound loaded: %s\n", filePath);
@@ -36,7 +36,7 @@ void SoundManager::loadAssets()
     FireSound.SetBuffer(FireBuffer);
 
     // hit music
-    GetPrivateProfileString("Music", "Hit", "", fileName, BUFFER_SIZE, root->mConfigFileName.c_str());
+    GetPrivateProfileString("Music", "Hit", "", fileName, BUFFER_SIZE, root->mConfigFilename.c_str());
     strcpy(filePath, root->mRootPath.c_str());    strcat(filePath, fileName);
     if(HitBuffer.LoadFromFile(filePath)){
         printf("[SoundManager] Hit sound loaded: %s\n", filePath);
@@ -47,7 +47,7 @@ void SoundManager::loadAssets()
     HitSound.SetBuffer(HitBuffer);
 
     // crash music
-    GetPrivateProfileString("Music", "Crash", "", fileName, BUFFER_SIZE, root->mConfigFileName.c_str());
+    GetPrivateProfileString("Music", "Crash", "", fileName, BUFFER_SIZE, root->mConfigFilename.c_str());
     strcpy(filePath, root->mRootPath.c_str());    strcat(filePath, fileName);
     if(CrashBuffer.LoadFromFile(filePath)){
         printf("[SoundManager] Crash sound loaded: %s\n", filePath);
@@ -58,7 +58,7 @@ void SoundManager::loadAssets()
     CrashSound.SetBuffer(CrashBuffer);
 
     // sea music
-    GetPrivateProfileString("Music", "Sea", "", fileName, BUFFER_SIZE, root->mConfigFileName.c_str());
+    GetPrivateProfileString("Music", "Sea", "", fileName, BUFFER_SIZE, root->mConfigFilename.c_str());
     strcpy(filePath, root->mRootPath.c_str());    strcat(filePath, fileName);
     if(SeaMusic.OpenFromFile(filePath)){
         printf("[SoundManager] Sea music opened: %s\n", filePath);
