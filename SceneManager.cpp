@@ -473,7 +473,7 @@ void SceneManager::updateTargets()
                     scene.mPosition = position;
                     aiVector3D distance = root->airplane->mPosition - position;
                     if(distance.Length() > EPSILON) distance.Normalize();
-                    scene.mVelocity = distance * flySpeed * root->mLevel;
+                    scene.mVelocity = distance * flySpeed * (float)root->mLevel;
                     scene.mVelocity.x += Random(0.3f) * flySpeed;
                     scene.mVelocity.z += Random(0.3f) * flySpeed;
                     scene.mVelocity.y = 0.f;
@@ -488,6 +488,18 @@ void SceneManager::updateTargets()
                     scene.mVelocity.y = 0.f;
                     scene.mVelocity.z = flySpeed;
                 }
+            }
+        }
+        if(strcmp(scene.name,"island")==0){
+            aiVector3D d = scene.mPosition - root->airplane->mPosition;
+            float dl = d.Length();
+            float dd = dl*dl;
+            if(dd > 320000.f){
+                aiVector3D v = flyDirection - root->airplane->mPosition;
+                scene.mPosition = root->airplane->mPosition + 300.f*v;
+                scene.mPosition.x += Random(100.f);
+                scene.mPosition.y = 0.f;
+                scene.mPosition.z += Random(300.f);
             }
         }
     }

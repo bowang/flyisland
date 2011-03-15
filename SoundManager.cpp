@@ -93,7 +93,7 @@ void SoundManager::play(SoundType type)
         CrashSound.Play();
         break;
     case Sea:
-        SeaMusic.SetVolume(volumn*0.9f);
+        SeaMusic.SetVolume(volumn*1.1f);
         SeaMusic.Play();
         break;
     default:
