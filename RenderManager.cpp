@@ -1,5 +1,6 @@
 #include "RenderManager.h"
 #include "Root.h"
+#include "Data_struct.h"
 
 extern sf::RenderWindow window;
 
@@ -52,9 +53,21 @@ void RenderManager::renderFrame(int j)
     renderPosition = j;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
+
     // render skybox first
     renderSkyBox();
+
+    // render ocean
+    this->setCameraDOF();
+    GL_CHECK(glEnable(GL_DEPTH_TEST))
+    GL_CHECK(glDepthMask(GL_TRUE))
+    float r_l_angle; 
+    if(root->target.z>0)
+        r_l_angle = atan(-root->target.x/root->target.z)/Pi*180.0;
+    else
+        r_l_angle = atan(-root->target.x/root->target.z)/Pi*180.0 + 180.0;
+
+    root->a_ocean_render->render_ocean(0.01, vector3(root->eye.x, root->eye.y, root->eye.z), r_l_angle);
     
     // render objects (airplane, island, etc)
     renderObjects();
@@ -68,6 +81,7 @@ void RenderManager::renderFrame(int j)
     
     // render text
     renderText();
+    
 }
 
 void RenderManager::renderObjects()

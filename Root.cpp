@@ -12,6 +12,7 @@ Root::Root(string configFileName)
     mConfigFileName = configFileName;
     loadConfigFile();
 
+    a_ocean_render = new render_ocean_class(129, 20.0, 20.0, 0.002, 1.0, vector2(1.0, 0.0));
     mSceneManager  = new SceneManager(this);
     mRenderManager = new RenderManager(this);
     mInputManager  = new InputManager(this);

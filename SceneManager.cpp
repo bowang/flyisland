@@ -96,6 +96,9 @@ void SceneManager::loadAssets()
         mParticleTypes[i].size  = GetPrivateProfileFloat(particleName, "size", 1.0f, root->mConfigFileName.c_str());
 
     }
+
+    // load ocean shader
+    root->a_ocean_render->initial_ocean_shader();
 }
 
 void SceneManager::genBoundingBox(int sceneIdx)

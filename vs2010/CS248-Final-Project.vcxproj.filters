@@ -60,6 +60,12 @@
     <ClCompile Include="..\FireParticle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Data_struct.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Render_water.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Shader.h">
@@ -110,6 +116,12 @@
     <ClInclude Include="..\FireParticle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\Data_struct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Render_water.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\shaders\phong.frag.glsl">
@@ -146,6 +158,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="..\shaders\phong_color.vert.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\shaders\ocean.frag.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\shaders\ocean.vert.glsl">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

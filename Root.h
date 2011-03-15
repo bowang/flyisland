@@ -7,6 +7,9 @@
 #include "InputManager.h"
 #include "SoundManager.h"
 
+#include "Render_water.h"
+#include "Data_struct.h"
+
 struct Light{
     float position[4];
     float ambient[4];
@@ -50,6 +53,9 @@ public:
     aiVector3D eye;
     aiVector3D target;
     aiVector3D up;
+    //----------- To render inifite ocean, need to know yaw (r_l_angle)
+    float r_l_angle;
+
     ViewMode viewMode;
 
     // Light parameters
@@ -62,6 +68,9 @@ public:
     RenderManager* mRenderManager;
     InputManager*  mInputManager;
     SoundManager*  mSoundManager;
+
+    //---------------- for render water ----------------
+    render_ocean_class* a_ocean_render;
 
 private:
     bool loadConfigFile();
