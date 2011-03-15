@@ -450,31 +450,43 @@ void SceneManager::updateTargets()
         SceneNode &scene = mSceneNodes[i];
         if(scene.target==true){
             if(scene.hit==false){
+                if(strcmp(scene.name,"balloon")==0){
+                    aiVector3D d = scene.mPosition - root->airplane->mPosition;
+                    float dl = d.Length();
+                    float dd = dl*dl;
+                    // if balloon is too far away from the airplane, destroy it!
+                    if(dd > 80000.f) scene.hit = true;
+                }
+                if(strcmp(scene.name,"ship")==0){
+                    // add update for ship here
+
+                }
                 scene.mPosition += scene.mVelocity;
-                scene.reappearClock.Reset();
             }
             else if(scene.reappearClock.GetElapsedTime() > 10.f){
                 if(strcmp(scene.name,"balloon")==0){
                     scene.hit = false;
                     aiVector3D position;
-                    position.x = Random(70.f);
+                    position.x = root->airplane->mPosition.x + Random(70.f);
                     position.y = (float)fabs(Random(15.f))+10.f;
-                    position.z = Random(70.f);
+                    position.z = root->airplane->mPosition.z + Random(70.f);
                     scene.mPosition = position;
-                    if(position.Length() > EPSILON) position.Normalize();
-                    scene.mVelocity = -position * root->mSceneManager->flySpeed * root->mLevel;
-                    scene.mVelocity.x += Random(0.3f)*root->mSceneManager->flySpeed;
-                    scene.mVelocity.z += Random(0.3f)*root->mSceneManager->flySpeed;
+                    aiVector3D distance = root->airplane->mPosition - position;
+                    if(distance.Length() > EPSILON) distance.Normalize();
+                    scene.mVelocity = distance * flySpeed * root->mLevel;
+                    scene.mVelocity.x += Random(0.3f) * flySpeed;
+                    scene.mVelocity.z += Random(0.3f) * flySpeed;
                     scene.mVelocity.y = 0.f;
                 }
                 if(strcmp(scene.name,"ship")==0){
+                    // add regeneration for ship here
                     scene.hit = false;
                     scene.mPosition.x = 0.f;
                     scene.mPosition.y = 0.f;
                     scene.mPosition.z = -50.f;
                     scene.mVelocity.x = 0.f;
                     scene.mVelocity.y = 0.f;
-                    scene.mVelocity.z = root->mSceneManager->flySpeed;
+                    scene.mVelocity.z = flySpeed;
                 }
             }
         }
@@ -485,6 +497,7 @@ void SceneManager::hitTarget(int i)
 {
     if(mSceneNodes[i].hit==false){
         mSceneNodes[i].hit = true;
+        mSceneNodes[i].reappearClock.Reset();
         root->mSoundManager->play(Hit);
         root->mPlayerScore += mSceneNodes[i].score;
         root->mLevel = root->mPlayerScore/50 + 1;
