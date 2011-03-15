@@ -53,6 +53,7 @@ private:
     sf::Clock cannonClock;
     sf::Clock fireClock;
     sf::Clock timeClock;
+    sf::Clock targetClock;
     std::stack<aiMatrix4x4> modelMatrixStack;
     aiMatrix4x4 modelMatrix;
     vector<BoundingBox> originalBoundingBox;

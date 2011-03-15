@@ -243,13 +243,13 @@ void SceneManager::initializeWorld()
 void SceneManager::updateWorld()
 {
     // update airplane
-    if(root->mEnableAirplane && airplaneClock.GetElapsedTime() > 0.001f){
+    if(root->mEnableAirplane && airplaneClock.GetElapsedTime() > 0.05f){
         updateAirplane();
         airplaneClock.Reset();
     }
 
     // update camera
-    if(root->mEnableAirplane && cameraClock.GetElapsedTime() > 0.001f){
+    if(root->mEnableAirplane && cameraClock.GetElapsedTime() > 0.05f){
         if(root->viewMode==FollowView){
             aiVector3D d = root->target - root->airplane->mPosition;
             root->target = root->airplane->mPosition;
@@ -279,7 +279,7 @@ void SceneManager::updateWorld()
     
     // update bounding box
     updateBoundingBox();
-    buildBoundingBoxBuffer();
+    // buildBoundingBoxBuffer();
 
     // update targets
     updateTargets();
@@ -344,7 +344,7 @@ void SceneManager::updateAirplane()
 void SceneManager::updateParticles(){
 
     // update cannon particles
-    if(cannonClock.GetElapsedTime() > 0.01f){
+    if(cannonClock.GetElapsedTime() > 0.05f){
         for(unsigned i = 0; i < mCannonParticles.size(); i++){
             if(!mCannonParticles[i].update(mBoundingBox)){
                 mCannonParticles.erase(mCannonParticles.begin()+i);
@@ -355,7 +355,7 @@ void SceneManager::updateParticles(){
     }
 
     // update fire particles
-    if(fireClock.GetElapsedTime() > 0.01f) {
+    if(fireClock.GetElapsedTime() > 0.05f) {
         for(unsigned i = 0; i < mFireParticles.size(); i++){
             if(!mFireParticles[i].update()){
                 mFireParticles.erase(mFireParticles.begin()+i);
@@ -454,6 +454,11 @@ void SceneManager::updateBoundingBox()
 
 void SceneManager::updateTargets()
 {
+    if(targetClock.GetElapsedTime() < 0.05f)
+        return;
+    else
+        targetClock.Reset();
+
     for(unsigned i = 0; i < mSceneNodes.size(); i++){
         SceneNode &scene = mSceneNodes[i];
         if(scene.target==true){
