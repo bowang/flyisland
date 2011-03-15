@@ -40,6 +40,7 @@ public:
     void rotateIncrease(float angleIncrement);
     void setRotateAxis(float rx, float ry, float rz);
     void setRotateAxis(aiVector3D v);
+    void loadParameters(const char* sceneName, const char* configFilename);
 
 private:
     string mSceneName;
@@ -47,7 +48,6 @@ private:
 
     void buildIndexBuffer();
     void loadTextures();
-    void loadParameters(const char* sceneName, const char* configFilename);
 
 protected:
 

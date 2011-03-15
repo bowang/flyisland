@@ -95,6 +95,15 @@ void InputManager::handleInput()
             case sf::Key::L:
                 root->mWind.z += 5.f;
                 break;
+            case sf::Key::Return:
+                root->mAirplaneCrash = false;
+                root->mPlayerScore = 0;
+                root->mLevel = 1;
+                root->mMinute = 0;
+                root->mSecond = 0;
+                root->mSceneManager->initializeWorld();
+                root->airplane->loadParameters("Scene 0", root->mConfigFilename.c_str());
+                break;
             default:
                 break;
             }

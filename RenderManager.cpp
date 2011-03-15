@@ -48,7 +48,7 @@ void RenderManager::preprocess()
 {
     // renderCubeFaces(root->mSceneManager->mSceneNodes[0]);
     oceanRender->initial_ocean_shader();
-    initializeCamera();
+    // initializeCamera();
 }
 
 void RenderManager::renderFrame(int j) 
@@ -793,6 +793,15 @@ void RenderManager::renderText()
     sf::String levelText(level, root->mFont, 50.f);
     levelText.SetColor(sf::Color(0,255,0));
     levelText.Move(WINDOW_WIDTH/2-90, 700.f);
+
+    // game over
+    if(root->mAirplaneCrash){
+        char over[] = "Game Over";
+        sf::String overText(over, root->mFont, 100.f);
+        overText.SetColor(sf::Color(255,0,0));
+        overText.Move(WINDOW_WIDTH/2-270, WINDOW_HEIGHT/2-70);
+        window.Draw(overText);
+    }
 
     window.Draw(scoreText);
     window.Draw(timeText);

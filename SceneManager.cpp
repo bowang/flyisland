@@ -340,7 +340,6 @@ void SceneManager::updateAirplane()
         // root->airplane->setRotateAxis(v);
         // root->airplane->rotate(-yaw);
     }
-
 }
 
 void SceneManager::updateParticles(){
