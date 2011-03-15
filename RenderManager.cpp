@@ -62,10 +62,11 @@ void RenderManager::renderFrame(int j)
     GL_CHECK(glEnable(GL_DEPTH_TEST))
     GL_CHECK(glDepthMask(GL_TRUE))
     float r_l_angle; 
-    if(root->target.z>0)
-        r_l_angle = atan(-root->target.x/root->target.z)/Pi*180.0;
+    aiVector3D v = root->target - root->eye;
+    if(v.z>0)
+        r_l_angle = atan(-v.x/v.z)/Pi*180.0;
     else
-        r_l_angle = atan(-root->target.x/root->target.z)/Pi*180.0 + 180.0;
+        r_l_angle = atan(-v.x/v.z)/Pi*180.0 + 180.0;
 
     root->a_ocean_render->render_ocean(0.01, vector3(root->eye.x, root->eye.y, root->eye.z), r_l_angle);
     
@@ -400,7 +401,7 @@ void RenderManager::setCamera() {
     GLfloat nearClip = 0.1f;
     GLfloat farClip = 500.0f;
     GLfloat fieldOfView = 45.0f; // Degrees
-
+    
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(fieldOfView, aspectRatio, nearClip, farClip);
