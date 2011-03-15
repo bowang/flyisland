@@ -50,6 +50,8 @@ private:
     GLuint tColorCubeMap;
     int renderPosition;
     render_ocean_class* oceanRender;
+	//------------- need aiMatrix4x4 pj_mv
+	aiMatrix4x4 pj_mv;
 
 protected:
 

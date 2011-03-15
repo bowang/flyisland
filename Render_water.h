@@ -34,7 +34,7 @@ public:
 	float max_height;
 	my2Darray_vector3 mesh;
 	my2Darray_vector2 e_x_t;
-	vector<unsigned int> indexBuffer[4];	//3 levels of index buffer, 0 is the finest and 2 is the roughest
+	vector<unsigned int> indexBuffer[5];	//3 levels of index buffer, 0 is the finest and 2 is the roughest
 	ocean_mesh(int N_, float Lx_, float Lz_);
 	void cal_ocean_mesh(ocean_wave & wave_set);
 	void fft_cal_ocean_mesh(ocean_wave & wave_set);
@@ -50,10 +50,16 @@ class quat_tree_ocean{
 private:
 	float Lx, Lz;	//size of an ocean_path
 	vector2 cam_position, left_sight_norm, right_sight_norm, sight_dir, left_sight_dir, right_sight_dir;//its 2D
+	float cam_height;
 	vector2 relative_origin;
 	int tree_level;	//for level ==1, root node bbox is the same as the ocean path
 	//for level = 2, root node bbox contain 2^2=4 ocean path, level=3, root node bbox contain 2^3 = 8 pathes
 	int sub_level;	//for sub_level, continuing divide ocean pathes,
+
+	//-------------collide according to the frustum
+	vector3 frustum_normal[6];
+	float frustum_b[6];
+
 public:
 	vector<quat_tree_node> quat_tree; //this is actually a breadth priority tree
 	vector<vector2> ocean_path_center;	//this is the ocean path to render
@@ -61,10 +67,12 @@ public:
 	quat_tree_ocean(float Lx_, float Lz_, vector3 & cam_pos, float r_l_angle);
 	quat_tree_ocean(float Lx_, float Lz_);
 	void reset_cam_pos(vector3 & cam_pos, float r_l_angle);
-//	void set_view(vector3 & cam_pos, vector3 & view_dir);
 	void build_root_tree();
 	void build_tree_leaf();
 	void render_how_many();
+	void set_frustum(aiMatrix4x4 & pj_mv);
+	bool bbox_collide_frustum(float x_min, float x_max, float z_min, float z_max);
+	void build_by_frustum();
 };
 
 bool line_seg_arrow_collide(vector2 & v0, vector2 & v1, vector2 & o, vector2 & d);
@@ -72,6 +80,8 @@ bool line_seg_arrow_collide(vector2 & v0, vector2 & v1, vector2 & o, vector2 & d
 class render_ocean_class{
 private:
 	std::auto_ptr<Shader> ocean_shader;
+	vector3 frustum_normal[6];
+	float frustum_b[6];
 public:
 	ocean_wave wave_set;
 	ocean_mesh mesh_set;
@@ -80,7 +90,11 @@ public:
 		float largest_wave_, vector2 & wind_dir);
 	void initial_ocean_shader();
 	void reset_cam_pos(vector3 & cam_pos, float r_l_angle);
+	void set_frustum(aiMatrix4x4 & pj_mv);
 	void render_ocean(float elapsed_time, vector3 & cam_pos_, float r_l_angle_);
+	void render_ocean(float elapsed_time, vector3 & cam_pos_, aiMatrix4x4 & pj_mv_);
+
+	bool bbox_collide_frustum(float x_min, float x_max, float z_min, float z_max);
 
 };
 #endif
