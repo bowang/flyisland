@@ -18,7 +18,7 @@
 // #undef _DEBUG
 // #if _DEBUG
 
-#define DEBUG
+// #define DEBUG
 #ifdef DEBUG
 #define GL_CHECK(x) {\
   (x);\

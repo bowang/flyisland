@@ -774,7 +774,7 @@ void RenderManager::renderText()
     char score[17];
     sprintf(score, "Score %d", root->mPlayerScore);
     sf::String scoreText(score, root->mFont, 50.f);
-    scoreText.SetColor(sf::Color(0,0,255));
+    scoreText.SetColor(sf::Color(255,242,0));
     scoreText.Move(800.f, 700.f);
 
     // time
