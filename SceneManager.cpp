@@ -332,6 +332,10 @@ void SceneManager::updateAirplane()
             // root->airplane->mPosition.y = 0.f;
         }
 
+        if(root->airplane->mPosition.y > 50.f){
+            root->airplane->mPosition.y = 50.f;
+        }
+
         // rotate airscrew
         airscrewTopAngle += rotationSpeed/180.f*Pi;
         airscrewTailAngle += rotationSpeed/180.f*Pi;
@@ -469,6 +473,7 @@ void SceneManager::updateTargets()
                     float dd = dl*dl;
                     // if balloon is too far away from the airplane, destroy it!
                     if(dd > 80000.f) scene.hit = true;
+                    scene.mPosition += scene.mVelocity;
                 }
                 if(strcmp(scene.name,"ship")==0){
                     // add update for ship here
@@ -477,8 +482,24 @@ void SceneManager::updateTargets()
                     float dd = dl*dl;
                     // if ship is too far away from the airplane, destroy it!
                     if(dd > 80000.f) scene.hit = true;
+                
+                    scene.mPosition += scene.mVelocity;
+                    float x = scene.mPosition.x; float z = scene.mPosition.z;
+                    float x_in_patch = x+10.0- floor((x+10.0)/20.0)*20.0;
+                    float z_in_patch = z+10.0- floor((z+10.0)/20.0)*20.0;
+
+                    int i= int(x_in_patch/20*128);
+                    if(i<0)	i=0;
+                    else if(i>128) i=128;
+
+                    int j=int(z_in_patch/20*128);
+                    if(j<0) j=0;
+                    else if(j>128) j=128;
+
+                    float height = root->mRenderManager->oceanRender->mesh_set.mesh(i,j).y;
+                 //   if(height>0)
+                        scene.mPosition.y = height + 1.0f;
                 }
-                scene.mPosition += scene.mVelocity;
             }
             else if(scene.reappearClock.GetElapsedTime() > 10.f){
                 if(strcmp(scene.name,"balloon")==0){
@@ -498,9 +519,9 @@ void SceneManager::updateTargets()
                 if(strcmp(scene.name,"ship")==0){
                     // add regeneration for ship here
                     scene.hit = false;
-                    scene.mPosition.x = 0.f;
+                    scene.mPosition.x = Random(30.f);
                     scene.mPosition.y = 0.f;
-                    scene.mPosition.z = -50.f;
+                    scene.mPosition.z = Random(50.f);
                     scene.mVelocity.x = 0.f;
                     scene.mVelocity.y = 0.f;
                     scene.mVelocity.z = flySpeed;

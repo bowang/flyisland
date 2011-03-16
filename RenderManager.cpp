@@ -805,10 +805,10 @@ void RenderManager::renderText()
 
     // success
     if(root->mSuccess){
-        char win[] = "Win";
+        char win[] = "You Win!";
         sf::String winText(win, root->mFont, 100.f);
         winText.SetColor(sf::Color(255,0,0));
-        winText.Move(WINDOW_WIDTH/2-70, WINDOW_HEIGHT/2-70);
+        winText.Move(WINDOW_WIDTH/2-220, WINDOW_HEIGHT/2-70);
         window.Draw(winText);
     }
 

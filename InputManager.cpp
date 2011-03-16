@@ -100,6 +100,8 @@ void InputManager::handleInput()
                 {
                     float amplitude = root->mRenderManager->oceanRender->wave_set.val_A();
                     amplitude -= 0.0005f;
+                    if(amplitude < 0.00001f)
+                        amplitude = 0.00001f;
                     root->mRenderManager->oceanRender->wave_set.update_wind_speed(amplitude);
                 }
                 break;
